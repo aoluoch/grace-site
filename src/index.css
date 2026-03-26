@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+:root {
+  --color-navy: #202163;
+  --color-gold: #B38E34;
+  --color-white: #FFFFFF;
+}
+
 body {
   font-family: "Poppins", sans-serif;
+  background-color: var(--color-white);
+  color: var(--color-navy);
 }

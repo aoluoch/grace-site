@@ -1,0 +1,119 @@
+type DeclarationItem = {
+  id: number;
+  text: string;
+};
+
+const leftDeclarations: DeclarationItem[] = [
+  {
+    id: 1,
+    text: 'I decree and declare every prophetic word concerning my life is MANIFESTING in Jesus Name.',
+  },
+  {
+    id: 2,
+    text: 'I decree and declare that the will of God concerning my life, my family, my ministry, my career and business is MANIFESTING in Jesus Name.',
+  },
+  {
+    id: 3,
+    text: 'I am MANIFESTING the will of God in Jesus Name.',
+  },
+  {
+    id: 4,
+    text: 'I declare Nations, Kings, and Princes are coming to the MANIFESTATION of my rising in Jesus Name.',
+  },
+];
+
+const rightDeclarations: DeclarationItem[] = [
+  {
+    id: 6,
+    text: 'I am MANIFESTING my God-given purpose in Jesus Name.',
+  },
+  {
+    id: 7,
+    text: 'I decree and declare I am MANIFESTING and enjoying good health and long life in Jesus Name.',
+  },
+  {
+    id: 8,
+    text: 'In my year of PROPHETIC MANIFESTATION, I am enjoying divine peace and stability in every aspect of my life in Jesus Name.',
+  },
+  {
+    id: 9,
+    text: 'In my year of PROPHETIC MANIFESTATION, I am walking in open doors, favor and undeniable progress in Jesus Name.',
+  },
+];
+
+function highlightWords(text: string) {
+  return text
+    .split(/(MANIFESTING|MANIFESTATION|PROPHETIC MANIFESTATION)/g)
+    .map((part, index) => {
+      if (
+        part === 'MANIFESTING' ||
+        part === 'MANIFESTATION' ||
+        part === 'PROPHETIC MANIFESTATION'
+      ) {
+        return (
+          <span key={`${part}-${index}`} className="font-semibold underline text-[#1f2167]">
+            {part}
+          </span>
+        );
+      }
+
+      return <span key={`${part}-${index}`}>{part}</span>;
+    });
+}
+
+function DeclarationCard({ item }: { item: DeclarationItem }) {
+  return (
+    <div className="relative pl-12">
+      <div className="absolute left-0 top-2 flex h-9 w-9 items-center justify-center rounded-full border border-[#c4a347] bg-[#c4a347] text-base font-semibold text-[#f9f3dc] shadow-sm">
+        {item.id}
+      </div>
+      <article className="rounded-2xl bg-[#f3f3f3] px-5 py-4 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
+        <p className="text-[1.1rem] leading-[1.55] text-[#222]">{highlightWords(item.text)}</p>
+      </article>
+    </div>
+  );
+}
+
+function Declaration() {
+  return (
+    <section className="bg-[#efefef] py-14 sm:py-16">
+      <div className="mx-auto w-full max-w-285 px-4 sm:px-6 lg:px-8">
+        <header className="mb-7">
+          <h2 className="font-serif text-4xl sm:text-5xl leading-tight text-[#1f2167]">
+            2025 Prophetic Declarations
+          </h2>
+          <p className="mt-1 text-xl text-[#666]">Speak these over your life in Jesus’ Name.</p>
+        </header>
+
+        <div className="grid gap-6 lg:grid-cols-[1fr_360px_1fr]">
+          <div className="space-y-4">
+            {leftDeclarations.map((item) => (
+              <DeclarationCard key={item.id} item={item} />
+            ))}
+          </div>
+
+          <div className="relative h-full min-h-155 overflow-hidden rounded-sm bg-black shadow-[0_4px_18px_rgba(0,0,0,0.18)]">
+            <div className="absolute left-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-[#c4a347] bg-[#c4a347] text-base font-semibold text-[#f9f3dc]">
+              5
+            </div>
+            <iframe
+              title="Instagram post"
+              src="https://www.instagram.com/p/C7QY2r2N9YQ/embed"
+              className="h-full min-h-155 w-full border-0"
+              allowTransparency={true}
+              loading="lazy"
+            />
+          </div>
+
+          <div className="space-y-4">
+            {rightDeclarations.map((item) => (
+              <DeclarationCard key={item.id} item={item} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export default Declaration;
