@@ -8,7 +8,7 @@ function Believer() {
           <article className="overflow-hidden border border-[#d9d9d9] bg-black shadow-[0_2px_10px_rgba(0,0,0,0.08)]">
             <iframe
               title="GAM TikTok post"
-              src="https://www.tiktok.com/embed/v2/7533494304778505494"
+              src="https://www.tiktok.com/embed/v2/7534202091783326982"
               className="h-full min-h-[430px] w-full lg:min-h-[520px]"
               allow="encrypted-media"
               loading="lazy"

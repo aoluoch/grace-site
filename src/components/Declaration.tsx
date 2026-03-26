@@ -99,10 +99,10 @@ function Declaration() {
 
           <div className="h-full overflow-hidden rounded-sm bg-black shadow-[0_4px_18px_rgba(0,0,0,0.18)]">
             <iframe
-              title="Instagram post"
-              src="https://www.instagram.com/p/C7QY2r2N9YQ/embed"
+              title="Instagram reel"
+              src="https://www.instagram.com/reel/DLTAiXvtv1G/embed"
               className="h-full min-h-[620px] w-full border-0 sm:min-h-[680px] lg:min-h-0"
-              allowTransparency={true}
+              allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
               loading="lazy"
             />
           </div>
