@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Slide {
   id: number;
@@ -51,6 +50,8 @@ const slides: Slide[] = [
 
 function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchEndX, setTouchEndX] = useState<number | null>(null);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -66,33 +67,44 @@ function Hero() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      nextSlide();
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
 
     return () => clearInterval(timer);
   }, []);
 
+  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    setTouchStartX(event.changedTouches[0].clientX);
+    setTouchEndX(null);
+  };
+
+  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+    setTouchEndX(event.changedTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX === null || touchEndX === null) return;
+
+    const swipeDistance = touchStartX - touchEndX;
+    const minimumSwipeDistance = 50;
+
+    if (swipeDistance > minimumSwipeDistance) {
+      nextSlide();
+    } else if (swipeDistance < -minimumSwipeDistance) {
+      prevSlide();
+    }
+  };
+
   return (
     <div className="relative w-full bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative min-h-150 lg:min-h-125 flex items-center">
-          <button
-            onClick={prevSlide}
-            className="absolute left-0 lg:-left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
-            aria-label="Previous slide"
-          >
-            <ChevronLeft className="w-8 h-8" />
-          </button>
-
-          <button
-            onClick={nextSlide}
-            className="absolute right-0 lg:-right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
-            aria-label="Next slide"
-          >
-            <ChevronRight className="w-8 h-8" />
-          </button>
-
-          <div className="w-full">
+        <div
+          className="relative min-h-150 lg:min-h-125 flex items-center"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div className="w-full touch-pan-y">
             {slides.map((slide, index) => (
               <div
                 key={slide.id}

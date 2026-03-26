@@ -3,7 +3,7 @@ type DeclarationItem = {
   text: string;
 };
 
-const leftDeclarations: DeclarationItem[] = [
+const declarations: DeclarationItem[] = [
   {
     id: 1,
     text: 'I decree and declare every prophetic word concerning my life is MANIFESTING in Jesus Name.',
@@ -20,9 +20,10 @@ const leftDeclarations: DeclarationItem[] = [
     id: 4,
     text: 'I declare Nations, Kings, and Princes are coming to the MANIFESTATION of my rising in Jesus Name.',
   },
-];
-
-const rightDeclarations: DeclarationItem[] = [
+  {
+    id: 5,
+    text: 'I decree and declare that every delay is turning into divine acceleration in Jesus Name.',
+  },
   {
     id: 6,
     text: 'I am MANIFESTING my God-given purpose in Jesus Name.',
@@ -68,38 +69,39 @@ function DeclarationCard({ item }: { item: DeclarationItem }) {
         {item.id}
       </div>
       <article className="rounded-2xl bg-[#f3f3f3] px-5 py-4 shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
-        <p className="text-[1.1rem] leading-[1.55] text-[#222]">{highlightWords(item.text)}</p>
+        <p className="text-[0.98rem] leading-[1.55] text-[#222] sm:text-[1.03rem]">{highlightWords(item.text)}</p>
       </article>
     </div>
   );
 }
 
 function Declaration() {
+  const middleIndex = Math.ceil(declarations.length / 2);
+  const leftDeclarations = declarations.slice(0, middleIndex);
+  const rightDeclarations = declarations.slice(middleIndex);
+
   return (
     <section className="bg-[#efefef] py-14 sm:py-16">
       <div className="mx-auto w-full max-w-285 px-4 sm:px-6 lg:px-8">
         <header className="mb-7">
-          <h2 className="font-serif text-4xl sm:text-5xl leading-tight text-[#1f2167]">
+          <h2 className="font-serif text-3xl leading-tight text-[#1f2167] sm:text-4xl lg:text-[2.75rem]">
             2025 Prophetic Declarations
           </h2>
-          <p className="mt-1 text-xl text-[#666]">Speak these over your life in Jesus’ Name.</p>
+          <p className="mt-1 text-[1rem] text-[#666] sm:text-[1.08rem]">Speak these over your life in Jesus’ Name.</p>
         </header>
 
-        <div className="grid gap-6 lg:grid-cols-[1fr_360px_1fr]">
+        <div className="grid items-stretch gap-6 lg:grid-cols-[1fr_360px_1fr]">
           <div className="space-y-4">
             {leftDeclarations.map((item) => (
               <DeclarationCard key={item.id} item={item} />
             ))}
           </div>
 
-          <div className="relative h-full min-h-155 overflow-hidden rounded-sm bg-black shadow-[0_4px_18px_rgba(0,0,0,0.18)]">
-            <div className="absolute left-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-[#c4a347] bg-[#c4a347] text-base font-semibold text-[#f9f3dc]">
-              5
-            </div>
+          <div className="h-full overflow-hidden rounded-sm bg-black shadow-[0_4px_18px_rgba(0,0,0,0.18)]">
             <iframe
               title="Instagram post"
               src="https://www.instagram.com/p/C7QY2r2N9YQ/embed"
-              className="h-full min-h-155 w-full border-0"
+              className="h-full min-h-[620px] w-full border-0 sm:min-h-[680px] lg:min-h-0"
               allowTransparency={true}
               loading="lazy"
             />
