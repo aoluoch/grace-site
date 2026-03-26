@@ -22,7 +22,7 @@ function Values() {
 				</h2>
 
 				<div className="mt-8 sm:mt-10 rounded-4xl border border-[#B38E34]/55 bg-transparent px-5 py-10 sm:px-10 sm:py-12 lg:px-14 lg:py-14">
-					<p className="mx-auto max-w-4xl text-[#262626] text-[1.45rem] sm:text-[1.8rem] lg:text-[2rem] leading-[1.45] sm:leading-normal font-normal">
+					<p className="mx-auto max-w-4xl text-[#262626] text-[1.15rem] sm:text-[1.35rem] lg:text-[1.55rem] leading-[1.55] sm:leading-[1.6] font-normal">
 						At Grace Arena Ministries, we are one big family — connected by{' '}
 						<span className="text-[#B38E34]">Love</span>,{' '}
 						<span className="text-[#B38E34]">Word</span>,{' '}
