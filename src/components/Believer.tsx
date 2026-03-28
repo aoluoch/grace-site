@@ -3,13 +3,13 @@ import { Phone } from 'lucide-react';
 function Believer() {
   return (
     <section id="new-believers" className="bg-[#efefef] py-10 sm:py-12 lg:py-16">
-      <div className="mx-auto w-full max-w-[1120px] px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-280 px-4 sm:px-6 lg:px-8">
         <div className="grid items-stretch gap-6 lg:grid-cols-[0.95fr_1.05fr]">
           <article className="overflow-hidden border border-[#d9d9d9] bg-black shadow-[0_2px_10px_rgba(0,0,0,0.08)]">
             <iframe
               title="GAM TikTok post"
               src="https://www.tiktok.com/embed/v2/7534202091783326982"
-              className="h-full min-h-[430px] w-full lg:min-h-[520px]"
+              className="h-full min-h-107.5 w-full lg:min-h-130"
               allow="encrypted-media"
               loading="lazy"
             />

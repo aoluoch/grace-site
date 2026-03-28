@@ -5,20 +5,43 @@ import { getContentfulEnv } from '../lib/utils';
 
 type LocalizedField<T> = T | Record<string, T>;
 
+type ContentfulLink = {
+  sys?: {
+    type?: string;
+    linkType?: 'Asset' | 'Entry';
+    id?: string;
+  };
+};
+
+type LocalizedAssetFile =
+  | {
+      url?: string;
+    }
+  | Record<
+      string,
+      {
+        url?: string;
+      }
+    >;
+
 type ContentfulEntry = {
   sys: {
     id: string;
     createdAt: string;
   };
   fields: {
-    titleOne?: LocalizedField<string>;
-    titleTwo?: LocalizedField<string>;
-    description?: LocalizedField<Document>;
-    image?: LocalizedField<{
-      sys?: {
-        id?: string;
-      };
-    }>;
+    titleOne?: LocalizedField<string | ContentfulLink>;
+    titleTwo?: LocalizedField<string | ContentfulLink>;
+    description?: LocalizedField<Document | ContentfulLink>;
+    image?: LocalizedField<
+      | {
+          sys?: {
+            id?: string;
+          };
+        }
+      | ContentfulLink
+    >;
+    [key: string]: LocalizedField<unknown> | undefined;
   };
 };
 
@@ -27,9 +50,7 @@ type ContentfulAsset = {
     id: string;
   };
   fields: {
-    file?: {
-      url?: string;
-    };
+    file?: LocalizedAssetFile;
   };
 };
 
@@ -37,6 +58,7 @@ type ContentfulResponse = {
   items?: ContentfulEntry[];
   includes?: {
     Asset?: ContentfulAsset[];
+    Entry?: ContentfulEntry[];
   };
 };
 
@@ -121,6 +143,19 @@ function toAssetUrl(rawUrl?: string): string {
   return rawUrl;
 }
 
+function getAssetFileUrl(file?: LocalizedAssetFile): string | undefined {
+  if (!file) {
+    return undefined;
+  }
+
+  if ('url' in file && typeof (file as { url?: unknown }).url === 'string') {
+    return (file as { url: string }).url;
+  }
+
+  const localized = Object.values(file).find((item) => item?.url);
+  return localized?.url;
+}
+
 function getFieldValue<T>(field?: LocalizedField<T>): T | undefined {
   if (!field) {
     return undefined;
@@ -134,8 +169,108 @@ function getFieldValue<T>(field?: LocalizedField<T>): T | undefined {
     return field as T;
   }
 
-  const localized = Object.values(field as Record<string, T>).find(Boolean);
-  return localized;
+  const localizedRecord = field as Record<string, T>;
+  // Prefer en-US when available, then first truthy locale value.
+  return localizedRecord['en-US'] ?? Object.values(localizedRecord).find(Boolean);
+}
+
+function resolveString(
+  value: unknown,
+  entryById: Map<string, ContentfulEntry>,
+  fallbackKeys: string[] = ['titleOne', 'titleTwo', 'title', 'name', 'headline']
+): string {
+  if (typeof value === 'string') {
+    return value.trim();
+  }
+
+  if (!isContentfulLink(value) || value.sys?.linkType !== 'Entry' || !value.sys.id) {
+    return '';
+  }
+
+  const linked = entryById.get(value.sys.id);
+  if (!linked) {
+    return '';
+  }
+
+  for (const key of fallbackKeys) {
+    const candidate = getFieldValue(linked.fields[key] as LocalizedField<unknown> | undefined);
+    if (typeof candidate === 'string' && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+
+  return '';
+}
+
+function resolveDocument(value: unknown, entryById: Map<string, ContentfulEntry>): Document {
+  if (value && typeof value === 'object' && (value as { nodeType?: string }).nodeType === BLOCKS.DOCUMENT) {
+    return value as Document;
+  }
+
+  if (isContentfulLink(value) && value.sys?.linkType === 'Entry' && value.sys.id) {
+    const linked = entryById.get(value.sys.id);
+    if (linked) {
+      const docCandidateKeys = ['description', 'body', 'content'];
+      for (const key of docCandidateKeys) {
+        const candidate = getFieldValue(linked.fields[key] as LocalizedField<unknown> | undefined);
+        if (
+          candidate &&
+          typeof candidate === 'object' &&
+          (candidate as { nodeType?: string }).nodeType === BLOCKS.DOCUMENT
+        ) {
+          return candidate as Document;
+        }
+      }
+    }
+  }
+
+  return emptyRichText;
+}
+
+function resolveImageUrl(
+  value: unknown,
+  assetUrlById: Map<string, string>,
+  entryById: Map<string, ContentfulEntry>
+): string {
+  if (!value) {
+    return '/hero.jpg';
+  }
+
+  if (typeof value === 'string') {
+    return toAssetUrl(value);
+  }
+
+  if (isContentfulLink(value)) {
+    const { linkType, id } = value.sys ?? {};
+
+    if (linkType === 'Asset' && id) {
+      return assetUrlById.get(id) || '/hero.jpg';
+    }
+
+    if (linkType === 'Entry' && id) {
+      const linked = entryById.get(id);
+      const nestedImage = linked ? getFieldValue(linked.fields.image as LocalizedField<unknown> | undefined) : undefined;
+      return resolveImageUrl(nestedImage, assetUrlById, entryById);
+    }
+  }
+
+  if (typeof value === 'object' && value && 'sys' in (value as Record<string, unknown>)) {
+    const id = (value as { sys?: { id?: string } }).sys?.id;
+    if (id) {
+      return assetUrlById.get(id) || '/hero.jpg';
+    }
+  }
+
+  return '/hero.jpg';
+}
+
+function isContentfulLink(value: unknown): value is ContentfulLink {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const sys = (value as ContentfulLink).sys;
+  return !!sys?.id && sys.type === 'Link';
 }
 
 function Hero() {
@@ -167,8 +302,9 @@ function Hero() {
         const endpoint = new URL(`https://${host}/spaces/${spaceId}/environments/master/entries`);
         endpoint.searchParams.set('access_token', accessToken);
         endpoint.searchParams.set('content_type', 'gamHero');
-        endpoint.searchParams.set('include', '2');
+        endpoint.searchParams.set('include', '10');
         endpoint.searchParams.set('order', 'sys.createdAt');
+        endpoint.searchParams.set('locale', '*');
 
         const response = await fetch(endpoint.toString());
         if (!response.ok) {
@@ -177,28 +313,33 @@ function Hero() {
 
         const data = (await response.json()) as ContentfulResponse;
         const assets = data.includes?.Asset ?? [];
+        const includedEntries = data.includes?.Entry ?? [];
+        const allEntries = [...(data.items ?? []), ...includedEntries];
+        const entryById = new Map(allEntries.map((entry) => [entry.sys.id, entry]));
+
         const assetUrlById = new Map(
-          assets.map((asset) => [asset.sys.id, toAssetUrl(asset.fields.file?.url)])
+          assets.map((asset) => [asset.sys.id, toAssetUrl(getAssetFileUrl(asset.fields.file))])
         );
 
-        const mappedSlides: Slide[] = (data.items ?? [])
-          .map((item) => {
-            const titleOne = getFieldValue(item.fields.titleOne)?.trim() || '';
-            const titleTwo =
-              getFieldValue(item.fields.titleTwo)?.trim() || '';
-            const description = getFieldValue(item.fields.description) ?? emptyRichText;
-            const imageRef = getFieldValue(item.fields.image);
-            const imageId = imageRef?.sys?.id;
+        const mappedSlides: Slide[] = (data.items ?? []).map((item) => {
+          const rawTitleOne = getFieldValue(item.fields.titleOne);
+          const rawTitleTwo = getFieldValue(item.fields.titleTwo);
+          const rawDescription = getFieldValue(item.fields.description);
+          const rawImage = getFieldValue(item.fields.image);
 
-            return {
-              id: item.sys.id,
-              titleOne,
-              titleTwo,
-              description,
-              image: imageId ? assetUrlById.get(imageId) || '/hero.jpg' : '/hero.jpg',
-            };
-          })
-          .filter((slide) => slide.titleOne && slide.titleTwo);
+          const titleOne = resolveString(rawTitleOne, entryById);
+          const titleTwo = resolveString(rawTitleTwo, entryById);
+          const description = resolveDocument(rawDescription, entryById);
+          const image = resolveImageUrl(rawImage, assetUrlById, entryById);
+
+          return {
+            id: item.sys.id,
+            titleOne: titleOne || 'Grace Arena Ministries',
+            titleTwo: titleTwo || 'When We Pray, Testimonies Follow',
+            description,
+            image,
+          };
+        });
 
         if (isMounted) {
           setSlides(mappedSlides);
