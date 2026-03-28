@@ -32,12 +32,12 @@ function Payment() {
   return (
     <section id="payment" className="bg-[#efefef] py-10 sm:py-12 lg:py-16">
       <div className="mx-auto w-full max-w-280 px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-4 lg:grid-cols-[0.95fr_1.25fr] lg:gap-5">
+        <div className="grid items-start gap-4 lg:grid-cols-[0.7fr_1.3fr] lg:gap-5">
           <article className="overflow-hidden border border-[#d0d0d0] bg-black shadow-[0_2px_10px_rgba(0,0,0,0.12)]">
             <iframe
               title="Pray In Tongues With Me - Prophet David Owusu"
               src="https://www.youtube-nocookie.com/embed/_wCtwX5qH28?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1"
-              className="h-60 w-full sm:h-80 lg:h-full lg:min-h-90"
+              className="h-60 w-full sm:h-72 lg:h-72 xl:h-80"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               referrerPolicy="strict-origin-when-cross-origin"
               allowFullScreen
@@ -69,7 +69,7 @@ function Payment() {
                         {block.entries.map((entry) => (
                           <p
                             key={`${block.region}-${entry.label}`}
-                            className="text-[0.8rem] font-semibold leading-snug tracking-[0.01em] text-[#1f2167] whitespace-normal wrap-break-word sm:text-[0.92rem] sm:whitespace-nowrap xl:text-[0.98rem]"
+                            className="text-[0.8rem] font-semibold leading-snug tracking-[0.01em] text-[#1f2167] whitespace-normal wrap-break-word sm:text-[0.92rem] xl:text-[0.98rem]"
                           >
                             <span className="text-[#b8aa69]">{entry.label}:</span>{' '}
                             <span className="break-all">{entry.value}</span>
@@ -86,7 +86,7 @@ function Payment() {
                   {sideEntries.map((entry, index) => (
                     <p
                       key={`${entry.label}-${index}`}
-                      className="text-[0.78rem] font-semibold leading-snug tracking-[0.01em] text-[#1f2167] whitespace-normal wrap-break-word sm:text-[0.88rem] sm:whitespace-nowrap xl:text-[0.95rem]"
+                      className="text-[0.78rem] font-semibold leading-snug tracking-[0.01em] text-[#1f2167] whitespace-normal wrap-break-word sm:text-[0.88rem] xl:text-[0.95rem]"
                     >
                       <span className="text-[#b8aa69]">{entry.label}:</span>{' '}
                       <span className="break-all">{entry.value}</span>
