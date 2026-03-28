@@ -1,74 +1,110 @@
-# React + TypeScript + Vite
+# Grace Arena Ministries Website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Official website for Grace Arena Ministries, built with React, TypeScript, Vite, Tailwind CSS, and Contentful CMS integration.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19
+- TypeScript 5
+- Vite 8
+- Tailwind CSS 4
+- React Router
+- Contentful SDK + Rich Text Renderer
+- ESLint
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Multi-page navigation:
+  - Home
+  - Events
+  - Event details
+  - Meet the Visionary
+- Dynamic CMS content from Contentful for key sections
+- Rich text rendering support (headings, lists, links, quotes, tables, etc.)
+- Responsive layout across desktop and mobile
+- Smooth scroll behavior for section navigation
 
-## Expanding the ESLint configuration
+## Project Structure
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- `src/components` — reusable UI sections and content blocks
+- `src/pages` — route-level pages
+- `src/lib` — utility helpers (including Contentful env handling)
+- `public` — static assets
+- `src/assets` — local image assets
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Environment Variables
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Create a `.env` file in the project root with:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```env
+VITE_CONTENTFUL_SPACE_ID=your_space_id
+VITE_CONTENTFUL_CDA_TOKEN=your_content_delivery_access_token
+VITE_CONTENTFUL_CDN_URL=cdn.contentful.com
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Notes:
+- `VITE_CONTENTFUL_SPACE_ID` and `VITE_CONTENTFUL_CDA_TOKEN` are required.
+- `VITE_CONTENTFUL_CDN_URL` is optional (defaults to `cdn.contentful.com`).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Installation
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-# grace-site
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Start development server:
+   ```bash
+   npm run dev
+   ```
+
+3. Build for production:
+   ```bash
+   npm run build
+   ```
+
+4. Preview production build:
+   ```bash
+   npm run preview
+   ```
+
+## Available Scripts
+
+From `package.json`:
+
+- `npm run dev` — run Vite dev server
+- `npm run build` — type-check and build
+- `npm run lint` — run ESLint
+- `npm run preview` — preview built app
+
+## Routes
+
+Defined in `src/App.tsx`:
+
+- `/` → Home
+- `/about` → Meet the Visionary
+- `/events` → Events listing
+- `/events/:eventId` → Event detail page
+
+## Contentful Content Types Used
+
+The app fetches content from these Contentful types:
+
+- `gamHero`
+- `declarations`
+- `gaMcare`
+- `membership`
+- `visionary`
+
+If Contentful data is missing/unavailable, UI fallbacks are rendered where configured.
+
+## Development Notes
+
+- Router is initialized in `src/main.tsx`.
+- Navbar is rendered globally above route content.
+- Styling is Tailwind-first with some component-level custom class values.
+- Strict TypeScript and ESLint rules are enabled.
+
+## License
+
+Private project. All rights reserved by Grace Arena Ministries.
