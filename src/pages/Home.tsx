@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Hero from '../components/Hero';
 import Values from '../components/Values';
 import Roadmap from '../components/Roadmap';
@@ -11,24 +12,44 @@ import Payment from '../components/Payment';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
 
+const NAVBAR_OFFSET = 80;
+
 function Home() {
+  const location = useLocation();
+
   useEffect(() => {
-    if (!window.location.hash) {
+    if (!location.hash) {
       return;
     }
 
-    const sectionId = window.location.hash.replace('#', '');
-    const target = document.getElementById(sectionId);
+    let attempts = 0;
+    let timeoutId: number | undefined;
 
-    if (!target) {
-      return;
-    }
+    const scrollToHashTarget = () => {
+      attempts += 1;
 
-    // Delay ensures section is laid out before smooth scrolling.
-    window.requestAnimationFrame(() => {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-  }, []);
+      const sectionId = decodeURIComponent(location.hash.replace('#', ''));
+      const target = document.getElementById(sectionId);
+
+      if (!target) {
+        if (attempts < 12) {
+          timeoutId = window.setTimeout(scrollToHashTarget, 120);
+        }
+        return;
+      }
+
+      const top = target.getBoundingClientRect().top + window.scrollY - NAVBAR_OFFSET;
+      window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
+    };
+
+    window.requestAnimationFrame(scrollToHashTarget);
+
+    return () => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+    };
+  }, [location.hash]);
 
   return (
     <main>
