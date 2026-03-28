@@ -3,8 +3,6 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Gimage from '../assets/fav.png';
 
-const NAVBAR_OFFSET = 80;
-
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
@@ -17,6 +15,25 @@ function Navbar() {
       document.body.style.overflow = '';
     };
   }, [isMenuOpen]);
+
+  const getNavbarOffset = () => {
+    const nav = document.querySelector('[data-site-navbar="true"]') as HTMLElement | null;
+    return (nav?.offsetHeight ?? 64) + 8;
+  };
+
+  const runAfterMenuClose = (callback: () => void) => {
+    if (!isMenuOpen) {
+      callback();
+      return;
+    }
+
+    setIsMenuOpen(false);
+
+    // Wait for menu state + body overflow reset on mobile.
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(callback);
+    });
+  };
 
   const navLinks = [
     { name: 'Home', to: '/' },
@@ -32,44 +49,45 @@ function Navbar() {
       return false;
     }
 
-    const top = target.getBoundingClientRect().top + window.scrollY - NAVBAR_OFFSET;
+    const top = target.getBoundingClientRect().top + window.scrollY - getNavbarOffset();
     window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
     window.history.replaceState(null, '', `/#${sectionId}`);
     return true;
   };
 
   const goToSection = (sectionId: string) => {
-    setIsMenuOpen(false);
-
-    if (location.pathname === '/') {
-      const didScroll = scrollToSection(sectionId);
-      if (!didScroll) {
-        navigate({ pathname: '/', hash: `#${sectionId}` });
+    runAfterMenuClose(() => {
+      if (location.pathname === '/') {
+        const didScroll = scrollToSection(sectionId);
+        if (!didScroll) {
+          navigate({ pathname: '/', hash: `#${sectionId}` });
+        }
+        return;
       }
-      return;
-    }
 
-    navigate({ pathname: '/', hash: `#${sectionId}` });
+      navigate({ pathname: '/', hash: `#${sectionId}` });
+    });
   };
 
   const closeMenu = () => setIsMenuOpen(false);
+
   const goHome = () => {
-    setIsMenuOpen(false);
+    runAfterMenuClose(() => {
+      if (location.pathname === '/') {
+        window.history.replaceState(null, '', '/');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
 
-    if (location.pathname === '/') {
-      window.history.replaceState(null, '', '/');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-
-    navigate('/');
-    window.requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      navigate('/');
+      window.requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
     });
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#FFFFFF] border-b border-[#202163]">
+    <nav data-site-navbar="true" className="sticky top-0 z-50 bg-[#FFFFFF] border-b border-[#202163]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center gap-3" onClick={closeMenu}>

@@ -12,8 +12,6 @@ import Payment from '../components/Payment';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
 
-const NAVBAR_OFFSET = 80;
-
 function Home() {
   const location = useLocation();
 
@@ -25,6 +23,11 @@ function Home() {
     let attempts = 0;
     let timeoutId: number | undefined;
 
+    const getNavbarOffset = () => {
+      const nav = document.querySelector('[data-site-navbar="true"]') as HTMLElement | null;
+      return (nav?.offsetHeight ?? 64) + 8;
+    };
+
     const scrollToHashTarget = () => {
       attempts += 1;
 
@@ -32,13 +35,13 @@ function Home() {
       const target = document.getElementById(sectionId);
 
       if (!target) {
-        if (attempts < 12) {
-          timeoutId = window.setTimeout(scrollToHashTarget, 120);
+        if (attempts < 30) {
+          timeoutId = window.setTimeout(scrollToHashTarget, 100);
         }
         return;
       }
 
-      const top = target.getBoundingClientRect().top + window.scrollY - NAVBAR_OFFSET;
+      const top = target.getBoundingClientRect().top + window.scrollY - getNavbarOffset();
       window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
     };
 
