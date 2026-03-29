@@ -1,8 +1,16 @@
-import { useEffect, useState } from 'react';
-import { createClient } from 'contentful';
-import { documentToReactComponents, type Options } from '@contentful/rich-text-react-renderer';
-import { BLOCKS, INLINES, MARKS, type Document } from '@contentful/rich-text-types';
-import { getContentfulEnv } from '../lib/utils';
+import { useEffect, useState } from "react";
+import { createClient } from "contentful";
+import {
+  documentToReactComponents,
+  type Options,
+} from "@contentful/rich-text-react-renderer";
+import {
+  BLOCKS,
+  INLINES,
+  MARKS,
+  type Document,
+} from "@contentful/rich-text-types";
+import { getContentfulEnv } from "../lib/utils";
 
 type VisionaryContent = {
   title: string;
@@ -10,7 +18,7 @@ type VisionaryContent = {
 };
 
 const fallbackContent: VisionaryContent = {
-  title: 'MEET APOSTLE DAVID OWUSU',
+  title: "MEET APOSTLE DAVID OWUSU",
   description: {
     nodeType: BLOCKS.DOCUMENT,
     data: {},
@@ -23,7 +31,11 @@ const richTextOptions: Options = {
     [MARKS.BOLD]: (text) => <strong>{text}</strong>,
     [MARKS.ITALIC]: (text) => <em>{text}</em>,
     [MARKS.UNDERLINE]: (text) => <u>{text}</u>,
-    [MARKS.CODE]: (text) => <code className="rounded bg-[#ECECF3] px-1 py-0.5 text-[0.95em]">{text}</code>,
+    [MARKS.CODE]: (text) => (
+      <code className="rounded bg-[#ECECF3] px-1 py-0.5 text-[0.95em]">
+        {text}
+      </code>
+    ),
     superscript: (text) => <sup>{text}</sup>,
     subscript: (text) => <sub>{text}</sub>,
     strikethrough: (text) => <s>{text}</s>,
@@ -34,35 +46,64 @@ const richTextOptions: Options = {
         {children}
       </p>
     ),
-    [BLOCKS.HEADING_1]: (_, children) => <h3 className="text-2xl font-semibold text-[#202163]">{children}</h3>,
-    [BLOCKS.HEADING_2]: (_, children) => <h4 className="text-xl font-semibold text-[#202163]">{children}</h4>,
-    [BLOCKS.HEADING_3]: (_, children) => <h5 className="text-lg font-semibold text-[#202163]">{children}</h5>,
-    [BLOCKS.HEADING_4]: (_, children) => <h6 className="text-base font-semibold text-[#202163]">{children}</h6>,
-    [BLOCKS.HEADING_5]: (_, children) => <h6 className="text-sm font-semibold text-[#202163]">{children}</h6>,
-    [BLOCKS.HEADING_6]: (_, children) => <h6 className="text-sm font-medium text-[#202163]">{children}</h6>,
-    [BLOCKS.UL_LIST]: (_, children) => <ul className="list-disc space-y-2 pl-6">{children}</ul>,
-    [BLOCKS.OL_LIST]: (_, children) => <ol className="list-decimal space-y-2 pl-6">{children}</ol>,
+    [BLOCKS.HEADING_1]: (_, children) => (
+      <h3 className="text-2xl font-semibold text-[#202163]">{children}</h3>
+    ),
+    [BLOCKS.HEADING_2]: (_, children) => (
+      <h4 className="text-xl font-semibold text-[#202163]">{children}</h4>
+    ),
+    [BLOCKS.HEADING_3]: (_, children) => (
+      <h5 className="text-lg font-semibold text-[#202163]">{children}</h5>
+    ),
+    [BLOCKS.HEADING_4]: (_, children) => (
+      <h6 className="text-base font-semibold text-[#202163]">{children}</h6>
+    ),
+    [BLOCKS.HEADING_5]: (_, children) => (
+      <h6 className="text-sm font-semibold text-[#202163]">{children}</h6>
+    ),
+    [BLOCKS.HEADING_6]: (_, children) => (
+      <h6 className="text-sm font-medium text-[#202163]">{children}</h6>
+    ),
+    [BLOCKS.UL_LIST]: (_, children) => (
+      <ul className="list-disc space-y-2 pl-6">{children}</ul>
+    ),
+    [BLOCKS.OL_LIST]: (_, children) => (
+      <ol className="list-decimal space-y-2 pl-6">{children}</ol>
+    ),
     [BLOCKS.LIST_ITEM]: (_, children) => <li>{children}</li>,
     [BLOCKS.QUOTE]: (_, children) => (
-      <blockquote className="border-l-4 border-[#B38E34] pl-3 italic text-[#2f2f2f]">{children}</blockquote>
+      <blockquote className="border-l-4 border-[#B38E34] pl-3 italic text-[#2f2f2f]">
+        {children}
+      </blockquote>
     ),
     [BLOCKS.HR]: () => <hr className="border-[#d5d5df]" />,
     [BLOCKS.TABLE]: (_, children) => (
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-[#d5d5df]">{children}</table>
+        <table className="w-full border-collapse border border-[#d5d5df]">
+          {children}
+        </table>
       </div>
     ),
     [BLOCKS.TABLE_ROW]: (_, children) => <tr>{children}</tr>,
     [BLOCKS.TABLE_HEADER_CELL]: (_, children) => (
-      <th className="border border-[#d5d5df] bg-[#f1f1f6] px-3 py-2 text-left">{children}</th>
+      <th className="border border-[#d5d5df] bg-[#f1f1f6] px-3 py-2 text-left">
+        {children}
+      </th>
     ),
-    [BLOCKS.TABLE_CELL]: (_, children) => <td className="border border-[#d5d5df] px-3 py-2">{children}</td>,
+    [BLOCKS.TABLE_CELL]: (_, children) => (
+      <td className="border border-[#d5d5df] px-3 py-2">{children}</td>
+    ),
     [BLOCKS.EMBEDDED_ENTRY]: () => null,
     [BLOCKS.EMBEDDED_ASSET]: () => null,
     [INLINES.HYPERLINK]: (node, children) => {
       const href = (node.data as { uri?: string })?.uri;
       return (
-        <a href={href} target="_blank" rel="noreferrer" className="underline text-[#1f2167] hover:text-[#B38E34]">
+        <a
+          href={href}
+          target="_blank"
+          rel="noreferrer"
+          className="underline text-[#1f2167] hover:text-[#B38E34]"
+        >
           {children}
         </a>
       );
@@ -91,22 +132,26 @@ function Visionary() {
         const client = createClient({ space: spaceId, accessToken, host });
 
         const response = await client.withoutUnresolvableLinks.getEntries({
-          content_type: 'visionary',
+          content_type: "visionary",
           limit: 1,
-          order: ['-sys.updatedAt'],
+          order: ["-sys.updatedAt"],
         });
 
         const entry = response.items[0];
         if (!entry) {
-          throw new Error('No Visionary content found.');
+          throw new Error("No Visionary content found.");
         }
 
         const fields = entry.fields as Record<string, unknown>;
-        const title = typeof fields.title === 'string' ? fields.title : fallbackContent.title;
+        const title =
+          typeof fields.title === "string"
+            ? fields.title
+            : fallbackContent.title;
         const description =
           fields.description &&
-          typeof fields.description === 'object' &&
-          (fields.description as { nodeType?: string }).nodeType === BLOCKS.DOCUMENT
+          typeof fields.description === "object" &&
+          (fields.description as { nodeType?: string }).nodeType ===
+            BLOCKS.DOCUMENT
             ? (fields.description as Document)
             : fallbackContent.description;
 
@@ -117,7 +162,11 @@ function Visionary() {
       } catch (error) {
         if (isMounted) {
           setContent(fallbackContent);
-          setErrorMessage(error instanceof Error ? error.message : 'Unable to load visionary content.');
+          setErrorMessage(
+            error instanceof Error
+              ? error.message
+              : "Unable to load visionary content.",
+          );
         }
       } finally {
         if (isMounted) {
@@ -142,7 +191,7 @@ function Visionary() {
               title="Official Launch of Grace Arena Ministries"
               src="https://www.youtube-nocookie.com/embed/X2pllMejoBw?rel=0&modestbranding=1&iv_load_policy=3&playsinline=1"
               className="h-full w-full border-0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               referrerPolicy="strict-origin-when-cross-origin"
               allowFullScreen
               loading="lazy"
@@ -158,10 +207,19 @@ function Visionary() {
           </header>
 
           <div className="space-y-5 px-5 py-6 sm:px-6">
-            {isLoading && <p className="text-[#4B4B67]">Loading visionary content...</p>}
-            {!isLoading && errorMessage && <p className="text-red-600">{errorMessage}</p>}
+            {isLoading && (
+              <p className="text-[#4B4B67]">Loading visionary content...</p>
+            )}
+            {!isLoading && errorMessage && (
+              <p className="text-red-600">{errorMessage}</p>
+            )}
             {!isLoading && (
-              <div className="space-y-5">{documentToReactComponents(content.description, richTextOptions)}</div>
+              <div className="space-y-5">
+                {documentToReactComponents(
+                  content.description,
+                  richTextOptions,
+                )}
+              </div>
             )}
           </div>
         </article>
