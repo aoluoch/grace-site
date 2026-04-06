@@ -106,34 +106,36 @@ function AnnouncementCard({ item }: { item: AnnouncementItem }) {
   return (
     <article className="overflow-hidden rounded-lg border border-[#ECECF3] bg-white shadow-md transition-shadow duration-300 hover:shadow-lg">
       <div className="flex flex-col md:flex-row">
-        {item.imageUrl ? (
-          <div className="shrink-0 md:w-64 lg:w-72 bg-[#ECECF3] overflow-hidden">
+        {/* Image Section */}
+        <div className="relative overflow-hidden md:w-2/5 lg:w-1/3 shrink-0 bg-[#ECECF3]">
+          {item.imageUrl ? (
             <img
-              src={`${item.imageUrl}?w=600&fm=webp&q=85`}
+              src={`${item.imageUrl}?w=800&fm=webp&q=85`}
               alt={item.title}
-              className="h-52 w-full object-cover md:h-full"
+              className="w-full h-64 md:h-80 object-contain hover:scale-105 transition-transform duration-300"
               loading="lazy"
             />
-          </div>
-        ) : (
-          <div className="hidden md:flex shrink-0 md:w-64 lg:w-72 items-center justify-center bg-[#ECECF3]">
-            <svg
-              className="h-14 w-14 text-[#B8B8C8]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"
-              />
-            </svg>
-          </div>
-        )}
+          ) : (
+            <div className="w-full h-64 md:h-80 bg-gradient-to-br from-[#ECECF3] to-[#D8D8E5] flex items-center justify-center">
+              <svg
+                className="w-16 h-16 text-[#B8B8C8]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"
+                />
+              </svg>
+            </div>
+          )}
+        </div>
 
-        <div className="flex flex-1 flex-col justify-start p-6 md:p-7">
+        {/* Content Section */}
+        <div className="p-6 md:p-8 flex-1 flex flex-col justify-center">
           <div className="mb-3 flex flex-wrap items-center gap-2">
             {item.category && (
               <span

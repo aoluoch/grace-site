@@ -91,7 +91,7 @@ function Navbar() {
     <nav data-site-navbar="true" className="sticky top-0 z-50 bg-[#FFFFFF] border-b border-[#202163]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link to="/" className="flex items-center gap-3" onClick={closeMenu}>
+          <Link to="/" className="flex items-center gap-3" onClick={goHome}>
             <img
               src={Gimage}
               alt="Grace Arena Ministries Logo"
