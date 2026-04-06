@@ -38,6 +38,7 @@ function Navbar() {
   const navLinks = [
     { name: 'Home', to: '/' },
     { name: 'Events', to: '/events' },
+    { name: 'Announcements', to: '/announcements' },
     { name: 'Meet The Visionary', to: '/about' },
     { name: 'GAM Roadmap', sectionId: 'gam-roadmap' },
     { name: 'GAM Care', sectionId: 'gam-care' },

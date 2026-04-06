@@ -434,7 +434,7 @@ function Hero() {
                 }`}
               >
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-stretch py-12 lg:py-16">
-                  <div className="order-2 lg:order-1 space-y-6 h-full flex flex-col justify-center">
+                  <div className="order-2 lg:order-1 space-y-6 h-full flex flex-col justify-start">
                     <p className="text-[#B38E34] text-sm sm:text-base tracking-wider uppercase">{slide.titleTwo}</p>
 
                     <div>
@@ -452,7 +452,7 @@ function Hero() {
                       <img
                         src={slide.image}
                         alt={`${slide.titleOne} poster`}
-                        className="w-full h-full object-cover rounded-lg shadow-2xl"
+                        className="w-full h-full object-contain rounded-lg shadow-2xl"
                         loading="lazy"
                       />
                     </div>
