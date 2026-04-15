@@ -116,7 +116,7 @@ function AnnouncementCard({ item }: { item: AnnouncementItem }) {
               loading="lazy"
             />
           ) : (
-            <div className="w-full h-64 md:h-80 bg-gradient-to-br from-[#ECECF3] to-[#D8D8E5] flex items-center justify-center">
+            <div className="w-full h-64 md:h-80 bg-linear-to-br from-[#ECECF3] to-[#D8D8E5] flex items-center justify-center">
               <svg
                 className="w-16 h-16 text-[#B8B8C8]"
                 fill="none"
