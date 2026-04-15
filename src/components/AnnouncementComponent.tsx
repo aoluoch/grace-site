@@ -1,8 +1,16 @@
-import { useEffect, useMemo, useState } from 'react';
-import { createClient } from 'contentful';
-import { documentToReactComponents, type Options } from '@contentful/rich-text-react-renderer';
-import { BLOCKS, INLINES, MARKS, type Document } from '@contentful/rich-text-types';
-import { getContentfulEnv } from '../lib/utils';
+import { useEffect, useMemo, useState } from "react";
+import { createClient } from "contentful";
+import {
+  documentToReactComponents,
+  type Options,
+} from "@contentful/rich-text-react-renderer";
+import {
+  BLOCKS,
+  INLINES,
+  MARKS,
+  type Document,
+} from "@contentful/rich-text-types";
+import { getContentfulEnv } from "../lib/utils";
 
 type AnnouncementItem = {
   id: string;
@@ -16,25 +24,25 @@ type AnnouncementItem = {
 const emptyDoc: Document = { nodeType: BLOCKS.DOCUMENT, data: {}, content: [] };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Service: 'bg-[#202163] text-white',
-  Prayer: 'bg-[#1f5c2e] text-white',
-  Event: 'bg-[#B38E34] text-white',
-  General: 'bg-[#4B4B67] text-white',
-  Youth: 'bg-[#7c3aed] text-white',
-  Giving: 'bg-[#b45309] text-white',
+  Service: "bg-[#202163] text-white",
+  Prayer: "bg-[#1f5c2e] text-white",
+  Event: "bg-[#B38E34] text-white",
+  General: "bg-[#4B4B67] text-white",
+  Youth: "bg-[#7c3aed] text-white",
+  Giving: "bg-[#b45309] text-white",
 };
 
 function categoryStyle(category?: string): string {
-  if (!category) return 'bg-[#4B4B67] text-white';
-  return CATEGORY_COLORS[category] ?? 'bg-[#4B4B67] text-white';
+  if (!category) return "bg-[#4B4B67] text-white";
+  return CATEGORY_COLORS[category] ?? "bg-[#4B4B67] text-white";
 }
 
 function formatDate(dateStr: string): string {
   try {
-    return new Intl.DateTimeFormat('en-KE', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
+    return new Intl.DateTimeFormat("en-KE", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
     }).format(new Date(dateStr));
   } catch {
     return dateStr;
@@ -47,7 +55,9 @@ const richTextOptions: Options = {
     [MARKS.ITALIC]: (text) => <em>{text}</em>,
     [MARKS.UNDERLINE]: (text) => <u>{text}</u>,
     [MARKS.CODE]: (text) => (
-      <code className="rounded bg-[#ECECF3] px-1 py-0.5 text-[0.95em]">{text}</code>
+      <code className="rounded bg-[#ECECF3] px-1 py-0.5 text-[0.95em]">
+        {text}
+      </code>
     ),
     superscript: (text) => <sup>{text}</sup>,
     subscript: (text) => <sub>{text}</sub>,
@@ -96,9 +106,9 @@ const richTextOptions: Options = {
 };
 
 function toAssetUrl(rawUrl?: string): string {
-  if (!rawUrl) return '';
-  if (rawUrl.startsWith('//')) return `https:${rawUrl}`;
-  if (rawUrl.startsWith('/')) return `https://images.ctfassets.net${rawUrl}`;
+  if (!rawUrl) return "";
+  if (rawUrl.startsWith("//")) return `https:${rawUrl}`;
+  if (rawUrl.startsWith("/")) return `https://images.ctfassets.net${rawUrl}`;
   return rawUrl;
 }
 
@@ -107,16 +117,16 @@ function AnnouncementCard({ item }: { item: AnnouncementItem }) {
     <article className="overflow-hidden rounded-lg border border-[#ECECF3] bg-white shadow-md transition-shadow duration-300 hover:shadow-lg">
       <div className="flex flex-col md:flex-row">
         {/* Image Section */}
-        <div className="relative overflow-hidden md:w-2/5 lg:w-1/3 shrink-0 bg-[#ECECF3]">
+        <div className="relative overflow-hidden w-full md:w-2/5 lg:w-1/3 shrink-0 bg-[#ECECF3] min-h-48 sm:min-h-56 md:h-full">
           {item.imageUrl ? (
             <img
               src={`${item.imageUrl}?w=800&fm=webp&q=85`}
               alt={item.title}
-              className="w-full h-64 md:h-80 object-contain hover:scale-105 transition-transform duration-300"
+              className="w-full h-full object-contain sm:object-cover hover:scale-105 transition-transform duration-300"
               loading="lazy"
             />
           ) : (
-            <div className="w-full h-64 md:h-80 bg-linear-to-br from-[#ECECF3] to-[#D8D8E5] flex items-center justify-center">
+            <div className="w-full h-full bg-linear-to-br from-[#ECECF3] to-[#D8D8E5] flex items-center justify-center">
               <svg
                 className="w-16 h-16 text-[#B8B8C8]"
                 fill="none"
@@ -174,8 +184,8 @@ function AnnouncementComponent() {
         const client = createClient({ space: spaceId, accessToken, host });
 
         const response = await client.withoutUnresolvableLinks.getEntries({
-          content_type: 'announcement',
-          order: ['-fields.date'],
+          content_type: "announcement",
+          order: ["-fields.date"],
           limit: 50,
         });
 
@@ -185,46 +195,64 @@ function AnnouncementComponent() {
           .map((item) => {
             const fields = item.fields as Record<string, unknown>;
 
-            const title = typeof fields.title === 'string' ? fields.title : '';
+            const title = typeof fields.title === "string" ? fields.title : "";
             const category =
-              typeof fields.category === 'string' ? fields.category : undefined;
-            const date = typeof fields.date === 'string' ? fields.date : '';
+              typeof fields.category === "string" ? fields.category : undefined;
+            const date = typeof fields.date === "string" ? fields.date : "";
 
             const bodyField = fields.body;
             const body =
               bodyField &&
-              typeof bodyField === 'object' &&
+              typeof bodyField === "object" &&
               (bodyField as { nodeType?: string }).nodeType === BLOCKS.DOCUMENT
                 ? (bodyField as Document)
                 : emptyDoc;
 
             const imageField = fields.image as
-              | { fields?: { file?: { url?: string } | Record<string, { url?: string }> } }
+              | {
+                  fields?: {
+                    file?: { url?: string } | Record<string, { url?: string }>;
+                  };
+                }
               | undefined;
 
             let imageUrl: string | undefined;
             if (imageField?.fields?.file) {
               const file = imageField.fields.file;
-              if ('url' in file && typeof file.url === 'string') {
+              if ("url" in file && typeof file.url === "string") {
                 imageUrl = toAssetUrl(file.url) || undefined;
               } else {
                 const localized = Object.values(
                   file as Record<string, { url?: string }>,
                 ).find((f) => f?.url);
-                if (localized?.url) imageUrl = toAssetUrl(localized.url) || undefined;
+                if (localized?.url)
+                  imageUrl = toAssetUrl(localized.url) || undefined;
               }
             }
 
             if (!title || !date) return null;
 
-            return { id: item.sys.id, title, body, imageUrl, category, date } satisfies AnnouncementItem;
+            return {
+              id: item.sys.id,
+              title,
+              body,
+              imageUrl,
+              category,
+              date,
+            } satisfies AnnouncementItem;
           })
-          .filter((i): i is NonNullable<typeof i> => i !== null) as AnnouncementItem[];
+          .filter(
+            (i): i is NonNullable<typeof i> => i !== null,
+          ) as AnnouncementItem[];
 
         setAnnouncements(items);
       } catch (err) {
         if (isMounted) {
-          setError(err instanceof Error ? err.message : 'Unable to load announcements.');
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Unable to load announcements.",
+          );
         }
       } finally {
         if (isMounted) setLoading(false);
@@ -238,14 +266,15 @@ function AnnouncementComponent() {
   }, []);
 
   const sorted = useMemo(
-    () => [...announcements].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    () =>
+      [...announcements].sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+      ),
     [announcements],
   );
 
   if (loading) {
-    return (
-      <div className="py-10 text-[#4B4B67]">Loading announcements...</div>
-    );
+    return <div className="py-10 text-[#4B4B67]">Loading announcements...</div>;
   }
 
   if (error) {
