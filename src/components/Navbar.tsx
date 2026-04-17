@@ -1,7 +1,7 @@
-import { Menu, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import Gimage from '../assets/fav.png';
+import { Menu, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import Gimage from "../assets/fav.png";
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -9,15 +9,17 @@ function Navbar() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+    document.body.style.overflow = isMenuOpen ? "hidden" : "";
 
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     };
   }, [isMenuOpen]);
 
   const getNavbarOffset = () => {
-    const nav = document.querySelector('[data-site-navbar="true"]') as HTMLElement | null;
+    const nav = document.querySelector(
+      '[data-site-navbar="true"]',
+    ) as HTMLElement | null;
     return (nav?.offsetHeight ?? 64) + 8;
   };
 
@@ -36,12 +38,13 @@ function Navbar() {
   };
 
   const navLinks = [
-    { name: 'Home', to: '/' },
-    { name: 'Events', to: '/events' },
-    { name: 'Announcements', to: '/announcements' },
-    { name: 'Meet The Visionary', to: '/about' },
-    { name: 'GAM Roadmap', sectionId: 'gam-roadmap' },
-    { name: 'GAM Care', sectionId: 'gam-care' },
+    { name: "Home", to: "/" },
+    { name: "Events", to: "/events" },
+    { name: "Announcements", to: "/announcements" },
+    { name: "Meet The Visionary", to: "/about" },
+    { name: "Shop", href: "https://gracearena.me/" },
+    { name: "GAM Roadmap", sectionId: "gam-roadmap" },
+    { name: "GAM Care", sectionId: "gam-care" },
   ];
 
   const scrollToSection = (sectionId: string) => {
@@ -50,23 +53,24 @@ function Navbar() {
       return false;
     }
 
-    const top = target.getBoundingClientRect().top + window.scrollY - getNavbarOffset();
-    window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
-    window.history.replaceState(null, '', `/#${sectionId}`);
+    const top =
+      target.getBoundingClientRect().top + window.scrollY - getNavbarOffset();
+    window.scrollTo({ top: Math.max(top, 0), behavior: "smooth" });
+    window.history.replaceState(null, "", `/#${sectionId}`);
     return true;
   };
 
   const goToSection = (sectionId: string) => {
     runAfterMenuClose(() => {
-      if (location.pathname === '/') {
+      if (location.pathname === "/") {
         const didScroll = scrollToSection(sectionId);
         if (!didScroll) {
-          navigate({ pathname: '/', hash: `#${sectionId}` });
+          navigate({ pathname: "/", hash: `#${sectionId}` });
         }
         return;
       }
 
-      navigate({ pathname: '/', hash: `#${sectionId}` });
+      navigate({ pathname: "/", hash: `#${sectionId}` });
     });
   };
 
@@ -74,21 +78,24 @@ function Navbar() {
 
   const goHome = () => {
     runAfterMenuClose(() => {
-      if (location.pathname === '/') {
-        window.history.replaceState(null, '', '/');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (location.pathname === "/") {
+        window.history.replaceState(null, "", "/");
+        window.scrollTo({ top: 0, behavior: "smooth" });
         return;
       }
 
-      navigate('/');
+      navigate("/");
       window.requestAnimationFrame(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: "smooth" });
       });
     });
   };
 
   return (
-    <nav data-site-navbar="true" className="sticky top-0 z-50 bg-[#FFFFFF] border-b border-[#202163]">
+    <nav
+      data-site-navbar="true"
+      className="sticky top-0 z-50 bg-[#FFFFFF] border-b border-[#202163]"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center gap-3" onClick={goHome}>
@@ -97,13 +104,15 @@ function Navbar() {
               alt="Grace Arena Ministries Logo"
               className="h-10 w-auto object-contain"
             />
-            <span className="text-lg font-semibold text-[#202163]">Grace Arena Ministries</span>
+            <span className="text-lg font-semibold text-[#202163]">
+              Grace Arena Ministries
+            </span>
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) =>
               link.to ? (
-                link.name === 'Home' ? (
+                link.name === "Home" ? (
                   <button
                     key={link.name}
                     type="button"
@@ -121,6 +130,16 @@ function Navbar() {
                     {link.name}
                   </Link>
                 )
+              ) : link.href ? (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="cursor-pointer text-[#202163] hover:text-[#B38E34] transition-colors text-sm font-medium"
+                >
+                  {link.name}
+                </a>
               ) : (
                 <button
                   key={link.name}
@@ -130,11 +149,11 @@ function Navbar() {
                 >
                   {link.name}
                 </button>
-              )
+              ),
             )}
             <button
               type="button"
-              onClick={() => goToSection('payment')}
+              onClick={() => goToSection("payment")}
               className="cursor-pointer bg-[#B38E34] hover:bg-[#202163] text-[#FFFFFF] px-6 py-2 rounded-md font-medium text-sm transition-colors"
             >
               Giving
@@ -156,7 +175,7 @@ function Navbar() {
           <div className="px-4 py-4 space-y-3">
             {navLinks.map((link) =>
               link.to ? (
-                link.name === 'Home' ? (
+                link.name === "Home" ? (
                   <button
                     key={link.name}
                     type="button"
@@ -175,6 +194,17 @@ function Navbar() {
                     {link.name}
                   </Link>
                 )
+              ) : link.href ? (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={closeMenu}
+                  className="block cursor-pointer text-[#202163] hover:text-[#B38E34] transition-colors text-sm font-medium py-2"
+                >
+                  {link.name}
+                </a>
               ) : (
                 <button
                   key={link.name}
@@ -184,11 +214,11 @@ function Navbar() {
                 >
                   {link.name}
                 </button>
-              )
+              ),
             )}
             <button
               type="button"
-              onClick={() => goToSection('payment')}
+              onClick={() => goToSection("payment")}
               className="block cursor-pointer bg-[#B38E34] hover:bg-[#202163] text-[#FFFFFF] px-6 py-2 rounded-md font-medium text-sm transition-colors text-center"
             >
               Giving
