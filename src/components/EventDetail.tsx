@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import Footer from "./Footer";
 import { createClient } from "contentful";
 import { getContentfulEnv } from "../lib/utils";
 import type {
@@ -143,13 +144,13 @@ const EventDetail = () => {
         </div>
         <h1 className="text-3xl font-bold text-center mb-8">{view.title}</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-          <div className="w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+          <div className="w-full h-full">
             {view.imageUrl && (
               <img
                 src={`${view.imageUrl}?w=1600&fit=fill&fm=jpg&q=80`}
                 alt={view.title}
-                className="w-full h-auto md:h-full object-cover rounded-xl shadow"
+                className="w-full h-full object-cover rounded-xl shadow"
               />
             )}
           </div>
@@ -207,7 +208,7 @@ const EventDetail = () => {
           </div>
         </div>
       </div>
-      <div className="mt-16 border-t border-gray-300"></div>
+      <Footer />
     </>
   );
 };

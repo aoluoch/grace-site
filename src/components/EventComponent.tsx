@@ -142,16 +142,16 @@ const EventComponent = () => {
         >
           <div className="flex flex-col md:flex-row">
             {/* Image Section */}
-            <div className="relative overflow-hidden md:w-2/5 lg:w-1/3 shrink-0 bg-[#ECECF3]">
+            <div className="relative overflow-hidden w-full md:w-2/5 lg:w-1/3 shrink-0 bg-[#ECECF3] min-h-48 sm:min-h-56 md:h-full">
               {event.imageUrl ? (
                 <img
                   src={`${event.imageUrl}?w=800&fm=webp&q=85`}
                   alt={event.title}
-                  className="w-full h-64 md:h-80 object-contain hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-contain sm:object-cover hover:scale-105 transition-transform duration-300"
                   loading="lazy"
                 />
               ) : (
-                <div className="w-full h-64 md:h-80 bg-linear-to-br from-[#ECECF3] to-[#D8D8E5] flex items-center justify-center">
+                <div className="w-full h-full bg-linear-to-br from-[#ECECF3] to-[#D8D8E5] flex items-center justify-center">
                   <svg
                     className="w-16 h-16 text-[#B8B8C8]"
                     fill="none"
