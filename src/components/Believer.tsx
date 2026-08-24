@@ -1,4 +1,38 @@
-import { Phone } from 'lucide-react';
+import { Phone, Play } from 'lucide-react';
+import { useState } from 'react';
+
+const TIKTOK_EMBED_SRC = 'https://www.tiktok.com/player/v1/7534202091783326982?autoplay=0&description=0';
+
+function TikTokEmbed() {
+  const [loaded, setLoaded] = useState(false);
+
+  if (loaded) {
+    return (
+      <iframe
+        title="GAM TikTok post"
+        src={TIKTOK_EMBED_SRC}
+        className="h-full min-h-107.5 w-full lg:min-h-130"
+        allow="fullscreen; encrypted-media; picture-in-picture"
+        loading="lazy"
+      />
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => setLoaded(true)}
+      aria-label="Load GAM TikTok post"
+      className="group flex h-full min-h-107.5 w-full flex-col items-center justify-center gap-4 bg-black text-white transition-colors hover:bg-[#111] lg:min-h-130"
+    >
+      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/25 transition-transform duration-200 group-hover:scale-110">
+        <Play className="h-7 w-7 translate-x-0.5 fill-white text-white" />
+      </span>
+      <span className="text-[1.05rem] font-medium">Watch on TikTok</span>
+      <span className="text-[0.85rem] text-white/60">Tap to load the post</span>
+    </button>
+  );
+}
 
 function Believer() {
   return (
@@ -6,13 +40,7 @@ function Believer() {
       <div className="mx-auto w-full max-w-280 px-4 sm:px-6 lg:px-8">
         <div className="grid items-stretch gap-6 lg:grid-cols-[0.95fr_1.05fr]">
           <article className="overflow-hidden border border-[#d9d9d9] bg-black shadow-[0_2px_10px_rgba(0,0,0,0.08)]">
-            <iframe
-              title="GAM TikTok post"
-              src="https://www.tiktok.com/embed/v2/7534202091783326982"
-              className="h-full min-h-107.5 w-full lg:min-h-130"
-              allow="encrypted-media"
-              loading="lazy"
-            />
+            <TikTokEmbed />
           </article>
 
           <div className="flex h-full flex-col">
