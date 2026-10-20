@@ -2,13 +2,13 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Hero from "../components/Hero";
 import Values from "../components/Values";
-import Roadmap from "../components/Roadmap";
+import RoadmapSummary from "../components/RoadmapSummary";
 import Membership from "../components/Membership";
 import Believer from "../components/Believer";
 import Declaration from "../components/Declaration";
 import Separator from "../components/Separator";
-import Care from "../components/Care";
-import Payment from "../components/Payment";
+import CareSummary from "../components/CareSummary";
+import GivingSummary from "../components/GivingSummary";
 import Contact from "../components/Contact";
 import Footer from "../components/Footer";
 
@@ -88,17 +88,17 @@ function Home() {
       <Separator />
       <Values />
       <Separator />
-      <Roadmap />
+      <RoadmapSummary />
       <Separator />
       <Declaration />
       <Separator />
-      <Care />
+      <CareSummary />
       <Separator />
       <Membership />
       <Separator />
       <Believer />
       <Separator />
-      <Payment />
+      <GivingSummary />
       <Separator />
       <Contact />
       <Footer />

@@ -1,4 +1,13 @@
+import { Fragment } from "react";
+import {
+	useSiteContent,
+	SITE_KEYS,
+	DEFAULT_CORE_VALUES,
+} from "../lib/siteContent";
+
 function Values() {
+	const content = useSiteContent(SITE_KEYS.values, DEFAULT_CORE_VALUES);
+
 	return (
 		<section className="relative overflow-hidden bg-[#f5f5f5] py-20 sm:py-24 lg:py-28">
 			<div className="absolute inset-x-0 top-0 z-0">
@@ -18,18 +27,24 @@ function Values() {
 
 			<div className="relative z-10 mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-14 text-center">
 				<h2 className="font-serif text-[#202163] text-4xl sm:text-5xl lg:text-6xl leading-tight">
-					Our Core Values
+					{content.heading}
 				</h2>
 
 				<div className="mt-8 sm:mt-10 rounded-4xl border border-[#B38E34]/55 bg-transparent px-5 py-10 sm:px-10 sm:py-12 lg:px-14 lg:py-14">
 					<p className="mx-auto max-w-4xl text-[#262626] text-[1.15rem] sm:text-[1.35rem] lg:text-[1.55rem] leading-[1.55] sm:leading-[1.6] font-normal">
-						At Grace Arena Ministries, we are one big family — connected by{' '}
-						<span className="text-[#B38E34]">Love</span>,{' '}
-						<span className="text-[#B38E34]">Word</span>,{' '}
-						<span className="text-[#B38E34]">Prayer</span>,{' '}
-						<span className="text-[#B38E34]">Service</span>,{' '}
-						<span className="text-[#B38E34]">Excellence</span>, and{' '}
-						<span className="text-[#B38E34]">Discipleship</span>.
+						{content.intro}
+						{content.values.length > 0 && ' '}
+						{content.values.map((value, index) => {
+							const isLast = index === content.values.length - 1;
+							const isFirst = index === 0;
+							return (
+								<Fragment key={`${value}-${index}`}>
+									{!isFirst && (isLast ? ' and ' : ', ')}
+									<span className="text-[#B38E34]">{value}</span>
+									{isLast && '.'}
+								</Fragment>
+							);
+						})}
 					</p>
 				</div>
 			</div>
