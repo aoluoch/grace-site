@@ -86,12 +86,21 @@ function Footer() {
 
         <div className="mt-8 border-t border-[#3a404d] pt-5 text-center text-[0.94rem] text-[#b8bcc6] sm:mt-10 sm:text-[1rem]">
           <p>© {year} Grace Arena Ministries. All Rights Reserved.</p>
-          <p className="mt-2">
+          <p className="mt-2 flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
             <Link
               to="/privacy-policy"
               className="font-medium text-[#d7dbe4] underline underline-offset-4 transition hover:text-[#c6a85a]"
             >
               Privacy Policy
+            </Link>
+            <span aria-hidden="true" className="text-[#5a606e]">
+              •
+            </span>
+            <Link
+              to="/terms"
+              className="font-medium text-[#d7dbe4] underline underline-offset-4 transition hover:text-[#c6a85a]"
+            >
+              Terms of Service
             </Link>
           </p>
         </div>

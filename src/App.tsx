@@ -6,6 +6,7 @@ import Events from "./pages/Events";
 import Announcements from "./pages/Announcements";
 import EventDetail from "./components/EventDetail";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Terms from "./pages/Terms";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -33,6 +34,7 @@ function App() {
       <Route path="/giving" element={<Giving />} />
       <Route path="/connect" element={<Connect />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<Terms />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
