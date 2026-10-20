@@ -1,36 +1,15 @@
-
-
-const paymentBlocks = [
-  {
-    region: "USA",
-    entries: [
-      { label: "CASHPAPP", value: "$GRACEHOUR1" },
-      { label: "ZELLE", value: "4697567320" },
-      { label: "ACC. NAME", value: "DOM INTERNATIONAL USA" },
-    ],
-  },
-  {
-    region: "UK",
-    entries: [
-      { label: "ACC. NO", value: "10460241" },
-      { label: "SC", value: "60-02-63" },
-      { label: "NAME", value: "DAVID OWUSU MINISTRIES" },
-    ],
-  },
-];
-
-const sideEntries = [
-  { label: "PAYBILL (KENYA)", value: "919143" },
-  { label: "ACC. NAME", value: "SEED / TITHE" },
-  { label: "PAYBILL (KENYA)", value: "7194870" },
-  { label: "ACC. NAME", value: "SEED / TITHE" },
-  { label: "WAVE / WORLD REMIT / MPESA", value: "+254 799 403 242" },
-  { label: "ZAMBIA MOMO", value: "0975 904 802" },
-  { label: "MOMO (GHANA)", value: "0550 738 873" },
-  { label: "PAYPAL", value: "david.kowusu@gmail.com" },
-];
+import {
+  useSiteContent,
+  SITE_KEYS,
+  DEFAULT_GIVING,
+} from "../lib/siteContent";
 
 function Payment() {
+  const { title, blocks: paymentBlocks, sideEntries } = useSiteContent(
+    SITE_KEYS.giving,
+    DEFAULT_GIVING,
+  );
+
   return (
     <section id="payment" className="bg-[#efefef] py-10 sm:py-12 lg:py-16">
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -39,7 +18,7 @@ function Payment() {
           {/* HEADER */}
           <header className="bg-[#1f2167] px-5 py-3">
             <h2 className="text-[1.05rem] font-semibold tracking-wide text-white">
-              DOM PAYMENT DETAILS
+              {title}
             </h2>
           </header>
 

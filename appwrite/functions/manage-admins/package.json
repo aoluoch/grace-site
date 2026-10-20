@@ -1,0 +1,10 @@
+{
+  "name": "manage-admins",
+  "version": "1.0.0",
+  "description": "Grant or revoke the admin label for Grace Arena accounts (admins only).",
+  "type": "module",
+  "main": "src/main.js",
+  "dependencies": {
+    "node-appwrite": "^14.1.0"
+  }
+}

@@ -23,3 +23,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Appwrite CLI local config (contains secrets)
+.clihome/
