@@ -100,7 +100,7 @@ function Footer() {
               to="/terms"
               className="font-medium text-[#d7dbe4] underline underline-offset-4 transition hover:text-[#c6a85a]"
             >
-              Terms of Service
+              Terms and Conditions
             </Link>
           </p>
         </div>
