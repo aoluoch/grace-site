@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import App from "./App.tsx";
 import Navbar from "./components/Navbar.tsx";
+import SessionTimeout from "./components/SessionTimeout.tsx";
 import { AuthProvider } from "./context/AuthContext.tsx";
 
 // Prevent browser from auto-restoring scroll positions on navigation,
@@ -16,6 +17,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
+        <SessionTimeout />
         <Navbar />
         <App />
       </AuthProvider>

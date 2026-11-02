@@ -59,6 +59,18 @@ export const logout = async () => {
 export const isAdmin = (user: AppUser | null): boolean =>
   !!user?.labels?.includes("admin");
 
+export const isTherapist = (user: AppUser | null): boolean =>
+  !!user?.labels?.includes("therapist");
+
+/** Where a signed-in person should land. Therapists go to their care desk. */
+export const accountHome = (
+  user: AppUser | null,
+  requested = "/dashboard",
+): string => {
+  if (isTherapist(user) && !isAdmin(user)) return "/therapy";
+  return requested;
+};
+
 /* ------------------------------------------------------------------ */
 /* Password recovery & account self-service                           */
 /* ------------------------------------------------------------------ */
@@ -157,6 +169,32 @@ export interface ContactInput {
   message: string;
 }
 
+export interface ProfessionalHelpInput {
+  fullName: string;
+  email: string;
+  phone: string;
+  helpType:
+    | "counseling"
+    | "marriage_family"
+    | "youth"
+    | "grief"
+    | "emotional_support"
+    | "crisis"
+    | "other";
+}
+
+export const submitProfessionalHelp = (
+  input: ProfessionalHelpInput,
+  userId?: string,
+) =>
+  tablesDB.createRow({
+    databaseId: DATABASE_ID,
+    tableId: TABLES.professionalHelp,
+    rowId: ID.unique(),
+    data: clean({ ...input, userId }),
+    permissions: ownerPerms(userId),
+  });
+
 export const submitContact = (input: ContactInput, userId?: string) =>
   tablesDB.createRow({
     databaseId: DATABASE_ID,
@@ -226,25 +264,11 @@ export const registerForEvent = (input: RegistrationInput, userId?: string) =>
 /* Public content                                                     */
 /* ------------------------------------------------------------------ */
 
-export const listEvents = () =>
-  tablesDB.listRows({
-    databaseId: DATABASE_ID,
-    tableId: TABLES.events,
-    queries: [Query.equal("published", true), Query.orderAsc("date"), Query.limit(100)],
-  });
-
 export const listSermons = () =>
   tablesDB.listRows({
     databaseId: DATABASE_ID,
     tableId: TABLES.sermons,
     queries: [Query.equal("published", true), Query.orderDesc("$createdAt"), Query.limit(100)],
-  });
-
-export const listAnnouncements = () =>
-  tablesDB.listRows({
-    databaseId: DATABASE_ID,
-    tableId: TABLES.announcements,
-    queries: [Query.equal("published", true), Query.orderDesc("$createdAt"), Query.limit(50)],
   });
 
 /* ------------------------------------------------------------------ */
@@ -345,12 +369,36 @@ export const saveProfile = async (userId: string, input: ProfileInput) => {
 /* Admin                                                              */
 /* ------------------------------------------------------------------ */
 
-export const adminList = (tableId: string, queries: string[] = []) =>
-  tablesDB.listRows({
-    databaseId: DATABASE_ID,
-    tableId,
-    queries: [Query.orderDesc("$createdAt"), Query.limit(100), ...queries],
-  });
+/**
+ * Load every row an admin can see. Appwrite returns at most 100 rows per
+ * request, so follow the cursor until the table is exhausted.
+ */
+export const adminList = async (tableId: string, queries: string[] = []) => {
+  const pageSize = 100;
+  const rows: Models.Row[] = [];
+  let cursor: string | undefined;
+  let total = 0;
+
+  for (let page = 0; page < 50; page++) {
+    const res = await tablesDB.listRows({
+      databaseId: DATABASE_ID,
+      tableId,
+      queries: [
+        Query.orderDesc("$createdAt"),
+        Query.limit(pageSize),
+        ...queries,
+        ...(cursor ? [Query.cursorAfter(cursor)] : []),
+      ],
+    });
+    total = res.total;
+    rows.push(...res.rows);
+    const lastId = res.rows[res.rows.length - 1]?.$id;
+    if (res.rows.length < pageSize || !lastId || lastId === cursor) break;
+    cursor = lastId;
+  }
+
+  return { total, rows };
+};
 
 export const adminUpdateStatus = (
   tableId: string,

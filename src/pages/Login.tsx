@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { accountHome } from "../lib/api";
+import { SESSION_SIGNOUT_KEY } from "../lib/sessionTimeout";
 import {
   Field,
   TextInput,
@@ -17,7 +19,25 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<Status>(null);
 
-  const from = (location.state as { from?: string } | null)?.from ?? "/dashboard";
+  const locationState = location.state as { from?: string; reason?: string } | null;
+  const from = locationState?.from ?? "/dashboard";
+  const [signedOutForInactivity, setSignedOutForInactivity] = useState(
+    locationState?.reason === "inactivity",
+  );
+
+  useEffect(() => {
+    if (locationState?.reason === "inactivity") {
+      setSignedOutForInactivity(true);
+    }
+    try {
+      if (sessionStorage.getItem(SESSION_SIGNOUT_KEY) === "inactivity") {
+        sessionStorage.removeItem(SESSION_SIGNOUT_KEY);
+        setSignedOutForInactivity(true);
+      }
+    } catch {
+      /* Notice is optional when storage is blocked. */
+    }
+  }, [locationState?.reason]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -25,8 +45,11 @@ function Login() {
     setLoading(true);
     setStatus(null);
     try {
-      await login(fd.get("email") as string, fd.get("password") as string);
-      navigate(from, { replace: true });
+      const signedIn = await login(
+        fd.get("email") as string,
+        fd.get("password") as string,
+      );
+      navigate(accountHome(signedIn, from), { replace: true });
     } catch (err) {
       setStatus({
         type: "error",
@@ -47,6 +70,12 @@ function Login() {
         <p className="mt-1 text-sm text-[#676767]">
           Sign in to access your Grace Arena member area.
         </p>
+        {signedOutForInactivity && (
+          <p className="mt-4 rounded-md border border-[#B38E34]/40 bg-[#B38E34]/10 px-4 py-3 text-sm text-[#202163]">
+            You were signed out after 15 minutes without activity. Sign in again
+            to continue.
+          </p>
+        )}
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <Field label="Email" required>
             <TextInput type="email" name="email" required autoComplete="email" />

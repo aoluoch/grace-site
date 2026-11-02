@@ -166,7 +166,7 @@ function AdminManagers() {
                   className="flex items-center justify-between gap-3 rounded-xl border border-[#dcdcdc] bg-white p-4 shadow-sm"
                 >
                   <div className="min-w-0">
-                    <p className="truncate font-semibold text-[#202163]">
+                    <p className="break-words font-semibold text-[#202163]">
                       {admin.name || "—"}{" "}
                       {isSelf && (
                         <span className="ml-1 rounded-full bg-[#202163]/10 px-2 py-0.5 text-xs font-medium text-[#202163]">
@@ -174,7 +174,7 @@ function AdminManagers() {
                         </span>
                       )}
                     </p>
-                    <p className="truncate text-sm text-[#676767]">
+                    <p className="break-all text-sm text-[#676767]">
                       {admin.email}
                     </p>
                   </div>

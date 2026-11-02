@@ -13,6 +13,7 @@ import {
   signup as apiSignup,
   logout as apiLogout,
   isAdmin as checkAdmin,
+  isTherapist as checkTherapist,
   type AppUser,
 } from "../lib/api";
 
@@ -20,7 +21,8 @@ interface AuthContextValue {
   user: AppUser | null;
   loading: boolean;
   isAdmin: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  isTherapist: boolean;
+  login: (email: string, password: string) => Promise<AppUser>;
   signup: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
@@ -54,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (email: string, password: string) => {
     const u = await apiLogin(email, password);
     setUser(u);
+    return u;
   }, []);
 
   const signup = useCallback(
@@ -74,6 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       loading,
       isAdmin: checkAdmin(user),
+      isTherapist: checkTherapist(user),
       login,
       signup,
       logout,

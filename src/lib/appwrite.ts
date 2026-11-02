@@ -55,14 +55,13 @@ export const TABLES = {
   profiles: "profiles",
   prayerRequests: "prayer_requests",
   appointments: "appointments",
-  events: "events",
   registrations: "registrations",
   testimonies: "testimonies",
   contactSubmissions: "contact_submissions",
   subscribers: "subscribers",
-  announcements: "announcements",
   sermons: "sermons",
   siteContent: "site_content",
+  professionalHelp: "professional_help",
 } as const;
 
 export type TableId = (typeof TABLES)[keyof typeof TABLES];

@@ -11,33 +11,19 @@ import {
   Field,
   TextInput,
   TextArea,
-  Select,
   SubmitButton,
   FormStatus,
   type Status,
 } from "../forms/formControls";
 import { Eye, EyeOff, Pencil, Trash2, X } from "lucide-react";
 
-type ContentKind = "events" | "sermons" | "announcements";
+type ContentKind = "sermons";
 
 const TABLE_FOR: Record<ContentKind, string> = {
-  events: TABLES.events,
   sermons: TABLES.sermons,
-  announcements: TABLES.announcements,
 };
 
 type Row = Models.Row & Record<string, unknown>;
-
-/** Convert a stored ISO date to a value usable by <input type="datetime-local">. */
-function toLocalInput(iso?: unknown): string {
-  if (typeof iso !== "string" || !iso) return "";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
-    d.getHours(),
-  )}:${pad(d.getMinutes())}`;
-}
 
 const str = (v: unknown): string => (typeof v === "string" ? v : "");
 
@@ -52,42 +38,83 @@ const emptyToNull = (v: FormDataEntryValue | null): string | null => {
 };
 
 /** Build the row payload for a given kind from the submitted form. */
-function buildData(
-  kind: ContentKind,
-  fd: FormData,
-): Record<string, unknown> {
-  const published = fd.get("published") === "on";
-  if (kind === "events") {
-    const dateRaw = fd.get("date") as string;
-    return {
-      title: fd.get("title"),
-      description: emptyToNull(fd.get("description")),
-      date: dateRaw ? new Date(dateRaw).toISOString() : undefined,
-      location: emptyToNull(fd.get("location")),
-      category: fd.get("category") || undefined,
-      imageUrl: emptyToNull(fd.get("imageUrl")),
-      published,
-      registrationOpen: fd.get("registrationOpen") === "on",
-    };
-  }
-  if (kind === "sermons") {
-    return {
-      title: fd.get("title"),
-      speaker: emptyToNull(fd.get("speaker")),
-      description: emptyToNull(fd.get("description")),
-      videoUrl: emptyToNull(fd.get("videoUrl")),
-      audioUrl: emptyToNull(fd.get("audioUrl")),
-      topic: emptyToNull(fd.get("topic")),
-      published,
-    };
-  }
+function buildData(fd: FormData): Record<string, unknown> {
   return {
     title: fd.get("title"),
-    body: fd.get("body"),
-    organization: fd.get("organization") || undefined,
-    published,
-    publishedAt: new Date().toISOString(),
+    speaker: emptyToNull(fd.get("speaker")),
+    description: emptyToNull(fd.get("description")),
+    videoUrl: emptyToNull(fd.get("videoUrl")),
+    audioUrl: emptyToNull(fd.get("audioUrl")),
+    topic: emptyToNull(fd.get("topic")),
+    published: fd.get("published") === "on",
   };
+}
+
+function DetailLine({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  if (!value) return null;
+  return (
+    <p className="break-words text-sm text-[#212121] [overflow-wrap:anywhere]">
+      <span className="font-semibold text-[#676767]">{label}: </span>
+      {value}
+    </p>
+  );
+}
+
+/** Every stored field, wrapped so long titles, bodies, and links stay readable. */
+function ContentDetails({ row }: { row: Row }) {
+  const description = str(row.description);
+  const body = str(row.body);
+  const date = str(row.date);
+  const publishedAt = str(row.publishedAt);
+  const when = date || publishedAt;
+  const whenLabel = date ? "Date" : "Published";
+  let whenText = "";
+  if (when) {
+    const d = new Date(when);
+    whenText = Number.isNaN(d.getTime()) ? when : d.toLocaleString();
+  }
+
+  return (
+    <div className="mt-2 space-y-1.5">
+      {description && (
+        <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-[#212121]">
+          {description}
+        </p>
+      )}
+      {body && (
+        <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-[#212121]">
+          {body}
+        </p>
+      )}
+      <DetailLine label={whenLabel} value={whenText} />
+      <DetailLine label="Speaker" value={str(row.speaker)} />
+      <DetailLine label="Topic" value={str(row.topic)} />
+      <DetailLine label="Location" value={str(row.location)} />
+      <DetailLine label="Category" value={str(row.category)} />
+      <DetailLine
+        label="Ministry"
+        value={
+          ORGANIZATIONS.find((o) => o.value === str(row.organization))?.label ??
+          str(row.organization)
+        }
+      />
+      <DetailLine label="Video" value={str(row.videoUrl)} />
+      <DetailLine label="Audio" value={str(row.audioUrl)} />
+      <DetailLine label="Image" value={str(row.imageUrl)} />
+      {typeof row.registrationOpen === "boolean" && (
+        <DetailLine
+          label="Registration"
+          value={row.registrationOpen ? "Open" : "Closed"}
+        />
+      )}
+    </div>
+  );
 }
 
 function Checkbox({
@@ -184,7 +211,7 @@ function AdminContentManager({ kind }: { kind: ContentKind }) {
     setSaving(true);
     setStatus(null);
     try {
-      const data = buildData(kind, fd);
+      const data = buildData(fd);
       if (editingId) {
         const updated = await adminUpdate(tableId, editingId, data);
         setRows((prev) =>
@@ -245,124 +272,32 @@ function AdminContentManager({ kind }: { kind: ContentKind }) {
               />
             </Field>
 
-            {kind === "events" && (
-              <>
-                <Field label="Date & time" required>
-                  <TextInput
-                    type="datetime-local"
-                    name="date"
-                    required
-                    defaultValue={toLocalInput(editing?.date)}
-                  />
-                </Field>
-                <Field label="Location">
-                  <TextInput
-                    name="location"
-                    defaultValue={str(editing?.location)}
-                  />
-                </Field>
-                <Field label="Category">
-                  <Select
-                    name="category"
-                    defaultValue={str(editing?.category) || "service"}
-                  >
-                    {[
-                      "service",
-                      "conference",
-                      "kesha",
-                      "training",
-                      "membership",
-                      "outreach",
-                      "other",
-                    ].map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </Select>
-                </Field>
-                <Field label="Image URL">
-                  <TextInput
-                    name="imageUrl"
-                    placeholder="https://..."
-                    defaultValue={str(editing?.imageUrl)}
-                  />
-                </Field>
-                <Field label="Description">
-                  <TextArea
-                    name="description"
-                    defaultValue={str(editing?.description)}
-                  />
-                </Field>
-                <Checkbox
-                  name="registrationOpen"
-                  label="Registration open"
-                  defaultChecked={
-                    editing ? Boolean(editing.registrationOpen) : true
-                  }
-                />
-              </>
-            )}
-
-            {kind === "sermons" && (
-              <>
-                <Field label="Speaker">
-                  <TextInput
-                    name="speaker"
-                    defaultValue={str(editing?.speaker)}
-                  />
-                </Field>
-                <Field label="Topic">
-                  <TextInput name="topic" defaultValue={str(editing?.topic)} />
-                </Field>
-                <Field label="Video URL">
-                  <TextInput
-                    name="videoUrl"
-                    placeholder="https://youtube.com/..."
-                    defaultValue={str(editing?.videoUrl)}
-                  />
-                </Field>
-                <Field label="Audio URL">
-                  <TextInput
-                    name="audioUrl"
-                    placeholder="https://..."
-                    defaultValue={str(editing?.audioUrl)}
-                  />
-                </Field>
-                <Field label="Description">
-                  <TextArea
-                    name="description"
-                    defaultValue={str(editing?.description)}
-                  />
-                </Field>
-              </>
-            )}
-
-            {kind === "announcements" && (
-              <>
-                <Field label="Ministry">
-                  <Select
-                    name="organization"
-                    defaultValue={
-                      str(editing?.organization) || "grace_arena_kenya"
-                    }
-                  >
-                    {ORGANIZATIONS.map((o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
-                      </option>
-                    ))}
-                  </Select>
-                </Field>
-                <Field label="Body" required>
-                  <TextArea
-                    name="body"
-                    required
-                    defaultValue={str(editing?.body)}
-                  />
-                </Field>
-              </>
-            )}
+            <Field label="Speaker">
+              <TextInput name="speaker" defaultValue={str(editing?.speaker)} />
+            </Field>
+            <Field label="Topic">
+              <TextInput name="topic" defaultValue={str(editing?.topic)} />
+            </Field>
+            <Field label="Video URL">
+              <TextInput
+                name="videoUrl"
+                placeholder="https://youtube.com/..."
+                defaultValue={str(editing?.videoUrl)}
+              />
+            </Field>
+            <Field label="Audio URL">
+              <TextInput
+                name="audioUrl"
+                placeholder="https://..."
+                defaultValue={str(editing?.audioUrl)}
+              />
+            </Field>
+            <Field label="Description">
+              <TextArea
+                name="description"
+                defaultValue={str(editing?.description)}
+              />
+            </Field>
 
             <Checkbox
               name="published"
@@ -410,9 +345,9 @@ function AdminContentManager({ kind }: { kind: ContentKind }) {
                       : "border-[#dcdcdc]"
                   }`}
                 >
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="truncate font-semibold text-[#202163]">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="break-words font-semibold text-[#202163]">
                         {str(row.title) || "Untitled"}
                       </p>
                       <span
@@ -425,12 +360,7 @@ function AdminContentManager({ kind }: { kind: ContentKind }) {
                         {isPublished ? "Published" : "Draft"}
                       </span>
                     </div>
-                    <p className="mt-0.5 line-clamp-2 text-sm text-[#676767]">
-                      {str(row.description) ||
-                        str(row.body) ||
-                        str(row.speaker) ||
-                        "—"}
-                    </p>
+                    <ContentDetails row={row} />
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
                     <button
