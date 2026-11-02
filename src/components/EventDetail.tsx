@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import Footer from "./Footer";
 import EventRegistrationForm from "./forms/EventRegistrationForm";
 import { createClient } from "contentful";
+import { isPastEventDate } from "../lib/events";
 import { getContentfulEnv } from "../lib/utils";
 import type {
   Asset,
@@ -132,8 +133,12 @@ const EventDetail = () => {
       : undefined;
     const descriptionDoc = entry.fields.description as Document | undefined;
     const dateIso = getFirstLocaleString(entry.fields.date);
+    const parsedDate = dateIso ? new Date(dateIso) : null;
+    const dateValue =
+      parsedDate && !Number.isNaN(parsedDate.getTime()) ? parsedDate : null;
     const date = formatEventDate(dateIso);
-    return { title, summary, imageUrl, descriptionDoc, date };
+    const isPast = isPastEventDate(dateValue);
+    return { title, summary, imageUrl, descriptionDoc, date, isPast };
   }, [entry, assetsMap]);
 
   const handleShare = async () => {
@@ -377,14 +382,19 @@ const EventDetail = () => {
                     <section className="mt-10 border-t border-gray-100 pt-8">
                       <div className="mb-5 h-[3px] w-14 bg-[#B38E34]" />
                       <h2 className="text-2xl font-semibold text-[#202163]">
-                        Register for this event
+                        {view.isPast
+                          ? "Registration closed"
+                          : "Register for this event"}
                       </h2>
                       <p className="mb-6 mt-1 text-sm text-gray-500">
-                        Reserve your place and receive a confirmation reference.
+                        {view.isPast
+                          ? "This gathering is listed as a past event, so registration is closed."
+                          : "Reserve your place and receive a confirmation reference."}
                       </p>
                       <EventRegistrationForm
                         eventId={eventId}
                         eventTitle={view.title}
+                        disabled={view.isPast}
                       />
                     </section>
                   )}

@@ -18,6 +18,8 @@ import Care from "./pages/Care";
 import Giving from "./pages/Giving";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
+import ProfessionalHelp from "./pages/ProfessionalHelp";
+import TherapyDesk from "./pages/TherapyDesk";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -31,6 +33,7 @@ function App() {
       <Route path="/sermons" element={<Sermons />} />
       <Route path="/roadmap" element={<Roadmap />} />
       <Route path="/care" element={<Care />} />
+      <Route path="/professional-help" element={<ProfessionalHelp />} />
       <Route path="/giving" element={<Giving />} />
       <Route path="/connect" element={<Connect />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
@@ -52,6 +55,14 @@ function App() {
         element={
           <ProtectedRoute requireAdmin>
             <Admin />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/therapy"
+        element={
+          <ProtectedRoute requireTherapist>
+            <TherapyDesk />
           </ProtectedRoute>
         }
       />

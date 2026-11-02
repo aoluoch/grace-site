@@ -16,18 +16,32 @@ const ministryLinks: NavLink[] = [
   { name: "Meet The Visionary", to: "/about" },
   { name: "GAM Roadmap", to: "/roadmap" },
   { name: "GAM Care", to: "/care" },
+  { name: "Professional Help", to: "/professional-help" },
   { name: "Announcements", to: "/announcements" },
 ];
 
 const linkClass =
   "cursor-pointer text-[#202163] hover:text-[#B38E34] transition-colors text-sm font-medium";
 
+const actionClass =
+  "cursor-pointer bg-[#B38E34] hover:bg-[#202163] text-[#FFFFFF] px-5 py-2 rounded-md font-medium text-sm transition-colors";
+
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMinistryOpen, setIsMinistryOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin, isTherapist } = useAuth();
+  const accountTo = !user
+    ? "/login"
+    : isTherapist && !isAdmin
+      ? "/therapy"
+      : "/dashboard";
+  const accountLabel = user
+    ? isTherapist && !isAdmin
+      ? "Care desk"
+      : "Account"
+    : "Sign in";
   const ministryRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -135,19 +149,16 @@ function Navbar() {
               Shop
             </a>
 
-            <Link
-              to="/giving"
-              className="cursor-pointer bg-[#B38E34] hover:bg-[#202163] text-[#FFFFFF] px-5 py-2 rounded-md font-medium text-sm transition-colors"
-            >
+            <Link to="/giving" className={actionClass}>
               Giving
             </Link>
 
             <Link
-              to={user ? "/dashboard" : "/login"}
-              className="inline-flex items-center gap-1.5 text-[#202163] hover:text-[#B38E34] transition-colors text-sm font-medium"
+              to={accountTo}
+              className={`inline-flex items-center gap-1.5 ${actionClass}`}
             >
-              <UserCircle size={20} />
-              {user ? "Account" : "Sign in"}
+              <UserCircle size={18} />
+              {accountLabel}
             </Link>
           </div>
 
@@ -216,17 +227,17 @@ function Navbar() {
               <Link
                 to="/giving"
                 onClick={closeMenu}
-                className="flex-1 bg-[#B38E34] hover:bg-[#202163] text-center text-white px-6 py-2.5 rounded-md font-medium text-sm transition-colors"
+                className={`flex-1 text-center ${actionClass}`}
               >
                 Giving
               </Link>
               <Link
-                to={user ? "/dashboard" : "/login"}
+                to={accountTo}
                 onClick={closeMenu}
-                className="inline-flex items-center justify-center gap-1.5 rounded-md border border-[#202163]/30 px-4 py-2.5 text-sm font-medium text-[#202163] hover:text-[#B38E34]"
+                className={`inline-flex flex-1 items-center justify-center gap-1.5 text-center ${actionClass}`}
               >
-                <UserCircle size={20} />
-                {user ? "Account" : "Sign in"}
+                <UserCircle size={18} />
+                {accountLabel}
               </Link>
             </div>
           </div>

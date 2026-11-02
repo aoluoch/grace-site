@@ -75,7 +75,7 @@ export function TextArea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
       {...props}
-      className={`${baseField} min-h-[120px] resize-y ${props.className ?? ""}`}
+      className={`${baseField} min-h-[120px] resize-y [field-sizing:content] ${props.className ?? ""}`}
     />
   );
 }
@@ -86,15 +86,17 @@ export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
 
 export function SubmitButton({
   loading,
+  disabled,
   children,
 }: {
   loading?: boolean;
+  disabled?: boolean;
   children: ReactNode;
 }) {
   return (
     <button
       type="submit"
-      disabled={loading}
+      disabled={loading || disabled}
       className="inline-flex items-center justify-center gap-2 rounded-md bg-[#B38E34] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#202163] disabled:cursor-not-allowed disabled:opacity-60"
     >
       {loading && (

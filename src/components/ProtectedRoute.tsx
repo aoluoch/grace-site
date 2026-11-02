@@ -6,6 +6,8 @@ interface ProtectedRouteProps {
   children: ReactNode;
   /** When true, only users with the `admin` label may access the route. */
   requireAdmin?: boolean;
+  /** When true, only users with the `therapist` label may access the route. */
+  requireTherapist?: boolean;
 }
 
 function FullScreenLoader() {
@@ -16,8 +18,12 @@ function FullScreenLoader() {
   );
 }
 
-function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps) {
-  const { user, isAdmin, loading } = useAuth();
+function ProtectedRoute({
+  children,
+  requireAdmin = false,
+  requireTherapist = false,
+}: ProtectedRouteProps) {
+  const { user, isAdmin, isTherapist, loading } = useAuth();
   const location = useLocation();
 
   if (loading) return <FullScreenLoader />;
@@ -29,7 +35,15 @@ function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps)
   }
 
   if (requireAdmin && !isAdmin) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={isTherapist ? "/therapy" : "/dashboard"} replace />;
+  }
+
+  if (requireTherapist && !isTherapist) {
+    return <Navigate to={isAdmin ? "/admin" : "/dashboard"} replace />;
+  }
+
+  if (!requireAdmin && !requireTherapist && isTherapist && !isAdmin) {
+    return <Navigate to="/therapy" replace />;
   }
 
   return <>{children}</>;

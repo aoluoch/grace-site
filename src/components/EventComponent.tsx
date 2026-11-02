@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { createClient } from "contentful";
+import { isPastEventDate } from "../lib/events";
 import { getContentfulEnv } from "../lib/utils";
 import type {
   Asset,
@@ -120,21 +121,14 @@ const EventComponent = () => {
       return { id: event.sys.id, title, summary, imageUrl, date };
     });
 
-    const now = new Date();
-    const startOfToday = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-    );
-
     const upcoming: EventCard[] = [];
     const past: EventCard[] = [];
 
     cards.forEach((card) => {
-      if (card.date && card.date >= startOfToday) {
-        upcoming.push(card);
-      } else {
+      if (isPastEventDate(card.date)) {
         past.push(card);
+      } else {
+        upcoming.push(card);
       }
     });
 

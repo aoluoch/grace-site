@@ -115,6 +115,12 @@ function Care() {
               >
                 Give to GAM Care
               </Link>
+              <Link
+                to="/professional-help"
+                className="inline-flex items-center gap-2 rounded-md border border-white/40 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+              >
+                Request professional help
+              </Link>
             </div>
           </div>
         </section>

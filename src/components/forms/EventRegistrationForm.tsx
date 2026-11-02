@@ -14,11 +14,14 @@ import {
 interface EventRegistrationFormProps {
   eventId: string;
   eventTitle?: string;
+  /** Closed when the event is listed under Past Events. */
+  disabled?: boolean;
 }
 
 function EventRegistrationForm({
   eventId,
   eventTitle,
+  disabled = false,
 }: EventRegistrationFormProps) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -27,6 +30,7 @@ function EventRegistrationForm({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (disabled) return;
     const form = e.currentTarget;
     const fd = new FormData(form);
     setLoading(true);
@@ -62,6 +66,10 @@ function EventRegistrationForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <fieldset
+        disabled={disabled}
+        className="m-0 min-w-0 space-y-4 border-0 p-0 disabled:opacity-60"
+      >
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Full name" required>
           <TextInput
@@ -99,7 +107,10 @@ function EventRegistrationForm({
           <span className="text-[#B38E34]">{reference}</span>
         </p>
       )}
-      <SubmitButton loading={loading}>Register for this event</SubmitButton>
+      <SubmitButton loading={loading} disabled={disabled}>
+        {disabled ? "Registration closed" : "Register for this event"}
+      </SubmitButton>
+      </fieldset>
     </form>
   );
 }

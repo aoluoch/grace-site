@@ -3,13 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { adminList, adminUpdateStatus, adminDelete } from "../lib/api";
 import { TABLES, ORGANIZATIONS } from "../lib/appwrite";
+import { helpKindLabel } from "../lib/professionalHelp";
 import AdminContentManager from "../components/admin/AdminContentManager";
 import AdminSiteContent from "../components/admin/AdminSiteContent";
 import AdminManagers from "../components/admin/AdminManagers";
 import type { Models } from "appwrite";
 import { LogOut, RefreshCw, Trash2, LayoutDashboard } from "lucide-react";
 
-type Column = { key: string; label: string };
+type Column = { key: string; label: string; wide?: boolean };
 
 interface SubmissionView {
   tableId: string;
@@ -24,8 +25,11 @@ const SUBMISSION_VIEWS: SubmissionView[] = [
     label: "Prayer Requests",
     columns: [
       { key: "name", label: "Name" },
-      { key: "request", label: "Request" },
+      { key: "email", label: "Email" },
+      { key: "phone", label: "Phone" },
       { key: "contactPreference", label: "Contact" },
+      { key: "consent", label: "Consent" },
+      { key: "request", label: "Prayer request", wide: true },
     ],
     statuses: ["new", "praying", "completed"],
   },
@@ -34,9 +38,11 @@ const SUBMISSION_VIEWS: SubmissionView[] = [
     label: "Appointments",
     columns: [
       { key: "name", label: "Name" },
-      { key: "type", label: "Type" },
+      { key: "email", label: "Email" },
       { key: "phone", label: "Phone" },
+      { key: "type", label: "Type" },
       { key: "preferredDate", label: "Preferred" },
+      { key: "note", label: "Note", wide: true },
     ],
     statuses: ["pending", "accepted", "rescheduled", "rejected", "completed"],
   },
@@ -45,9 +51,12 @@ const SUBMISSION_VIEWS: SubmissionView[] = [
     label: "Registrations",
     columns: [
       { key: "name", label: "Name" },
+      { key: "email", label: "Email" },
+      { key: "phone", label: "Phone" },
       { key: "eventTitle", label: "Event" },
       { key: "attendanceType", label: "Attendance" },
-      { key: "reference", label: "Ref" },
+      { key: "reference", label: "Reference" },
+      { key: "notes", label: "Notes", wide: true },
     ],
     statuses: ["registered", "cancelled", "attended"],
   },
@@ -56,8 +65,10 @@ const SUBMISSION_VIEWS: SubmissionView[] = [
     label: "Inquiries",
     columns: [
       { key: "name", label: "Name" },
+      { key: "email", label: "Email" },
+      { key: "phone", label: "Phone" },
       { key: "subject", label: "Subject" },
-      { key: "message", label: "Message" },
+      { key: "message", label: "Message", wide: true },
     ],
     statuses: ["new", "read", "responded"],
   },
@@ -66,8 +77,9 @@ const SUBMISSION_VIEWS: SubmissionView[] = [
     label: "Testimonies",
     columns: [
       { key: "name", label: "Name" },
+      { key: "email", label: "Email" },
       { key: "title", label: "Title" },
-      { key: "body", label: "Testimony" },
+      { key: "body", label: "Testimony", wide: true },
     ],
     statuses: ["new", "approved", "rejected"],
   },
@@ -79,8 +91,21 @@ const SUBMISSION_VIEWS: SubmissionView[] = [
       { key: "email", label: "Email" },
       { key: "phone", label: "Phone" },
       { key: "organization", label: "Ministry" },
+      { key: "emailOptIn", label: "Email updates" },
+      { key: "smsOptIn", label: "SMS updates" },
     ],
     statuses: [],
+  },
+  {
+    tableId: TABLES.professionalHelp,
+    label: "Professional Help",
+    columns: [
+      { key: "fullName", label: "Full name" },
+      { key: "email", label: "Email" },
+      { key: "phone", label: "Phone" },
+      { key: "helpType", label: "Kind of help" },
+    ],
+    statuses: ["new", "in_progress", "closed"],
   },
 ];
 
@@ -89,7 +114,9 @@ const orgLabel = (v?: string) =>
 
 function formatCell(key: string, value: unknown): string {
   if (value === undefined || value === null || value === "") return "—";
+  if (typeof value === "boolean") return value ? "Yes" : "No";
   if (key === "organization") return orgLabel(value as string);
+  if (key === "helpType") return helpKindLabel(value as string);
   if (key === "preferredDate") {
     const d = new Date(value as string);
     return Number.isNaN(d.getTime()) ? "—" : d.toLocaleString();
@@ -170,79 +197,83 @@ function SubmissionsTable({ view }: { view: SubmissionView }) {
           No records yet.
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-[#dcdcdc] bg-white">
-          <table className="w-full min-w-[640px] text-left text-sm">
-            <thead className="bg-[#f6f6f9] text-xs uppercase tracking-wide text-[#676767]">
-              <tr>
-                {view.columns.map((c) => (
-                  <th key={c.key} className="px-4 py-3 font-semibold">
-                    {c.label}
-                  </th>
-                ))}
-                <th className="px-4 py-3 font-semibold">Received</th>
-                {view.statuses.length > 0 && (
-                  <th className="px-4 py-3 font-semibold">Status</th>
-                )}
-                <th className="px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#eee]">
-              {rows.map((row) => {
-                const r = row as unknown as Record<string, unknown>;
-                return (
-                  <tr key={row.$id} className="align-top">
-                    {view.columns.map((c) => (
-                      <td
-                        key={c.key}
-                        className="max-w-[240px] px-4 py-3 text-[#212121]"
-                      >
-                        <span className="line-clamp-3">
-                          {formatCell(c.key, r[c.key])}
-                        </span>
-                      </td>
-                    ))}
-                    <td className="whitespace-nowrap px-4 py-3 text-xs text-[#676767]">
-                      {new Date(row.$createdAt).toLocaleDateString()}
-                    </td>
+        <div className="space-y-4">
+          {rows.map((row) => {
+            const r = row as unknown as Record<string, unknown>;
+            const compact = view.columns.filter((c) => !c.wide);
+            const wide = view.columns.filter((c) => c.wide);
+            return (
+              <article
+                key={row.$id}
+                className="rounded-xl border border-[#dcdcdc] bg-white p-5 shadow-sm"
+              >
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-xs text-[#676767]">
+                    Received {new Date(row.$createdAt).toLocaleString()}
+                  </p>
+                  <div className="flex items-center gap-2">
                     {view.statuses.length > 0 && (
-                      <td className="px-4 py-3">
-                        <select
-                          value={(r.status as string) ?? view.statuses[0]}
-                          onChange={(e) =>
-                            updateStatus(row.$id, e.target.value)
-                          }
-                          className="rounded-md border border-[#d8d8de] px-2 py-1 text-xs"
-                        >
+                      <select
+                        value={(r.status as string) ?? view.statuses[0]}
+                        onChange={(e) => updateStatus(row.$id, e.target.value)}
+                        className="rounded-md border border-[#d8d8de] px-2 py-1 text-xs capitalize"
+                        aria-label="Status"
+                      >
                           {view.statuses.map((s) => (
                             <option key={s} value={s}>
-                              {s}
+                              {s.replaceAll("_", " ")}
                             </option>
                           ))}
-                        </select>
-                      </td>
+                      </select>
                     )}
-                    <td className="px-4 py-3">
-                      <button
-                        type="button"
-                        onClick={() => remove(row.$id)}
-                        className="text-[#b02a2a] hover:text-red-700"
-                        aria-label="Delete"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                    <button
+                      type="button"
+                      onClick={() => remove(row.$id)}
+                      className="text-[#b02a2a] hover:text-red-700"
+                      aria-label="Delete"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {compact.map((c) => (
+                    <div key={c.key} className="min-w-0">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-[#676767]">
+                        {c.label}
+                      </dt>
+                      <dd className="mt-1 break-words text-sm text-[#212121]">
+                        {formatCell(c.key, r[c.key])}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+
+                {wide.map((c) => {
+                  const text = formatCell(c.key, r[c.key]);
+                  if (text === "—") return null;
+                  return (
+                    <div key={c.key} className="mt-4">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-[#676767]">
+                        {c.label}
+                      </p>
+                      <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-relaxed text-[#212121]">
+                        {text}
+                      </p>
+                    </div>
+                  );
+                })}
+              </article>
+            );
+          })}
         </div>
       )}
     </div>
   );
 }
 
-const CONTENT_TABS = ["events", "sermons", "announcements"] as const;
+const CONTENT_TABS = ["sermons"] as const;
 const SITE_CONTENT_TAB = "site_content";
 const ADMINS_TAB = "admins";
 type TabKey = string;
